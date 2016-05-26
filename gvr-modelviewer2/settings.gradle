@@ -1,0 +1,1 @@
+include ':framework'include ':modelviewer2'project(':framework').projectDir = new File('../../GearVRf/GVRf/Framework/framework')
