@@ -28,7 +28,7 @@ public class ModelViewer2Activity extends GVRActivity implements
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
         String internalPath = getApplicationContext().getFilesDir().getPath();
-		setScript(new ModelViewer2Manager(internalPath), "gvr.xml");
+		setScript(new ModelViewer2Manager(), "gvr.xml");
 
     }
 

@@ -17,17 +17,20 @@ package org.gearvrf.modelviewer2;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 
 public class FilterFiles implements FilenameFilter {
 
-    private String myExtension;
-    public FilterFiles(String sExtension){
+    private ArrayList<String> myExtension;
+    public FilterFiles(ArrayList<String> sExtension){
         myExtension = sExtension;
     }
     @Override
     public boolean accept(File directory, String fileName) {
-        if(fileName.endsWith(myExtension)){
-            return true;
+        for(String tExtension : myExtension) {
+            if (fileName.endsWith(tExtension)) {
+                return true;
+            }
         }
         return false;
     }

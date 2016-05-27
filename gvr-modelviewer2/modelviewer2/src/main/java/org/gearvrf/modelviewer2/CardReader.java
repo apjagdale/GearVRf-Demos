@@ -2,6 +2,7 @@ package org.gearvrf.modelviewer2;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 
 /**
  /* Copyright 2015 Samsung Electronics Co., LTD
@@ -23,16 +24,16 @@ import java.io.FilenameFilter;
 public class CardReader {
 
     private String myDirectory;
-    private String myExtension;
+    private ArrayList<String> myExtension;
 
-    public CardReader(String sDirectory, String sExtension){
+    public CardReader(String sDirectory, ArrayList<String> sExtension){
         myDirectory = sDirectory;
         myExtension = sExtension;
     }
     public File[] getModels(){
         File directory = new File(myDirectory);
         FilenameFilter filter = new FilterFiles(myExtension);
-        File list[] = directory.listFiles();
+        File list[] = directory.listFiles(filter);
 
         return list;
     }
