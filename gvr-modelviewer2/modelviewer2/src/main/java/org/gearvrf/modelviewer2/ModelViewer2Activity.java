@@ -14,16 +14,66 @@
  */
 
 package org.gearvrf.modelviewer2;
+import android.view.GestureDetector.OnDoubleTapListener;
+import android.view.GestureDetector.OnGestureListener;
 
 import org.gearvrf.GVRActivity;
-
 import android.os.Bundle;
+import android.view.MotionEvent;
 
-public class ModelViewer2Activity extends GVRActivity {
+public class ModelViewer2Activity extends GVRActivity implements
+		OnGestureListener, OnDoubleTapListener{
 
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
-		setScript(new ModelViewer2Manager(), "gvr.xml");
+        String internalPath = getApplicationContext().getFilesDir().getPath();
+		setScript(new ModelViewer2Manager(internalPath), "gvr.xml");
+
+    }
+
+	@Override
+	public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
+		return false;
+	}
+
+	@Override
+	public boolean onDoubleTap(MotionEvent motionEvent) {
+		return false;
+	}
+
+	@Override
+	public boolean onDoubleTapEvent(MotionEvent motionEvent) {
+		return false;
+	}
+
+	@Override
+	public boolean onDown(MotionEvent motionEvent) {
+		return false;
+	}
+
+	@Override
+	public void onShowPress(MotionEvent motionEvent) {
+
+	}
+
+	@Override
+	public boolean onSingleTapUp(MotionEvent motionEvent) {
+		return false;
+	}
+
+	@Override
+	public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+		return false;
+	}
+
+	@Override
+	public void onLongPress(MotionEvent motionEvent) {
+
+	}
+
+	@Override
+	public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+		return false;
 	}
 }
