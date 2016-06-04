@@ -14,66 +14,86 @@
  */
 
 package org.gearvrf.modelviewer2;
-import android.view.GestureDetector.OnDoubleTapListener;
-import android.view.GestureDetector.OnGestureListener;
+
+import android.content.Intent;
+
+import org.gearvrf.util.VRTouchPadGestureDetector;
+import org.gearvrf.util.VRTouchPadGestureDetector.OnTouchPadGestureListener;
+import org.gearvrf.util.VRTouchPadGestureDetector.SwipeDirection;
 
 import org.gearvrf.GVRActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.util.Log;
 
 public class ModelViewer2Activity extends GVRActivity implements
-		OnGestureListener, OnDoubleTapListener{
+        OnTouchPadGestureListener {
+
+    private VRTouchPadGestureDetector mDetector = null;
+    private ModelViewer2Manager mManager = null;
 
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
-        String internalPath = getApplicationContext().getFilesDir().getPath();
-		setScript(new ModelViewer2Manager(), "gvr.xml");
 
+        mDetector = new VRTouchPadGestureDetector(this);
+        mManager = new ModelViewer2Manager();
+        setScript(mManager, "gvr.xml");
     }
 
-	@Override
-	public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
-		return false;
-	}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
+    }
 
-	@Override
-	public boolean onDoubleTap(MotionEvent motionEvent) {
-		return false;
-	}
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
 
-	@Override
-	public boolean onDoubleTapEvent(MotionEvent motionEvent) {
-		return false;
-	}
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.v("", "requestCode : " + requestCode);
+        Log.v("", "resultCode : " + resultCode);
+        Log.v("", "data : " + data.getDataString());
 
-	@Override
-	public boolean onDown(MotionEvent motionEvent) {
-		return false;
-	}
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
-	@Override
-	public void onShowPress(MotionEvent motionEvent) {
+    @Override
+    public void onBackPressed() {}
 
-	}
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        return super.onKeyLongPress(keyCode, event);
+    }
 
-	@Override
-	public boolean onSingleTapUp(MotionEvent motionEvent) {
-		return false;
-	}
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        mDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
 
-	@Override
-	public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-		return false;
-	}
+    @Override
+    public boolean onSingleTap(MotionEvent e) {
+        Log.v("", "onSingleTap");
+        mManager.onSingleTap(e);
+        return false;
+    }
 
-	@Override
-	public void onLongPress(MotionEvent motionEvent) {
+    @Override
+    public void onLongPress(MotionEvent e) {
+        Log.v("", "onLongPress");
+    }
 
-	}
-
-	@Override
-	public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-		return false;
-	}
+    @Override
+    public boolean onSwipe(MotionEvent e, SwipeDirection swipeDirection,
+                           float velocityX, float velocityY) {
+        Log.v("", "onSwipe");
+        mManager.onSwipe(e, swipeDirection, velocityX, velocityY);
+        return false;
+    }
 }
