@@ -32,10 +32,14 @@ public class CardReader {
     }
     public File[] getModels(){
         File directory = new File(myDirectory);
-        FilenameFilter filter = new FilterFiles(myExtension);
-        File list[] = directory.listFiles(filter);
 
-        return list;
+        if (directory.exists() && directory.isDirectory()) {
+            FilenameFilter filter = new FilterFiles(myExtension);
+            File list[] = directory.listFiles(filter);
+
+            return list;
+        }
+        return null;
     }
 
 }
