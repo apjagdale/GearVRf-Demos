@@ -1,26 +1,26 @@
 /************************************************************************************
 
-Filename    :   VRTouchPadGestureDetector.java
-Content     :   
-Created     :   
-Authors     :   
+ Filename    :   VRTouchPadGestureDetector.java
+ Content     :
+ Created     :
+ Authors     :
 
-Copyright   :   Copyright 2014 Oculus VR, Inc. All Rights reserved.
+ Copyright   :   Copyright 2014 Oculus VR, Inc. All Rights reserved.
 
-Licensed under the Oculus VR SDK License Version 3.0 (the "License"); 
-you may not use the Oculus VR SDK except in compliance with the License, 
-which is provided at the time of installation or download, or which 
-otherwise accompanies this software in either electronic or hard copy form.
+ Licensed under the Oculus VR SDK License Version 3.0 (the "License");
+ you may not use the Oculus VR SDK except in compliance with the License,
+ which is provided at the time of installation or download, or which
+ otherwise accompanies this software in either electronic or hard copy form.
 
-You may obtain a copy of the License at
+ You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.0 
+ http://www.oculusvr.com/licenses/LICENSE-3.0
 
-Unless required by applicable law or agreed to in writing, the Oculus VR SDK 
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+ Unless required by applicable law or agreed to in writing, the Oculus VR SDK
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
 
  *************************************************************************************/
 package org.gearvrf.util;
@@ -38,7 +38,7 @@ import android.view.View;
  * The {@link OnGestureListener} callback will notify users when a particular
  * motion event has occurred. This class should only be used with
  * {@link MotionEvent}s reported via touch (don't use for trackball events).
- * 
+ *
  * To use this class:
  * <ul>
  * <li>Create an instance of the {@code VRTouchPadGestureDetector} for your
@@ -69,7 +69,7 @@ public class VRTouchPadGestureDetector extends Object implements
         /**
          * Notified when a tap occurs with the up {@link MotionEvent} that
          * triggered it.
-         * 
+         *
          * @param e
          *            The up motion event that completed the first tap
          * @return true if the event is consumed, else false
@@ -79,7 +79,7 @@ public class VRTouchPadGestureDetector extends Object implements
         /**
          * Notified when a long press occurs with the initial on down
          * {@link MotionEvent} that triggered it.
-         * 
+         *
          * @param e
          *            The initial on down motion event that started the
          *            longpress.
@@ -88,7 +88,7 @@ public class VRTouchPadGestureDetector extends Object implements
 
         /**
          * Notified when a swipe occurs.
-         * 
+         *
          * @param e1
          *            The first down motion event that started the fling.
          * @param swipeDirection
@@ -102,7 +102,9 @@ public class VRTouchPadGestureDetector extends Object implements
          * @return true if the event is consumed, else false
          */
         boolean onSwipe(MotionEvent e, SwipeDirection swipeDirection,
-                float velocityX, float velocityY);
+                        float velocityX, float velocityY);
+
+        boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2, float arg3);
     }
 
     /**
@@ -112,7 +114,7 @@ public class VRTouchPadGestureDetector extends Object implements
     public interface OnTouchPadDoubleTapListener {
         /**
          * Notified when a single-tap occurs.
-         * 
+         *
          * @param e
          *            The down motion event of the single-tap.
          * @return true if the event is consumed, else false
@@ -121,7 +123,7 @@ public class VRTouchPadGestureDetector extends Object implements
 
         /**
          * Notified when a double-tap occurs.
-         * 
+         *
          * @param e
          *            The down motion event of the first tap of the double-tap.
          * @return true if the event is consumed, else false
@@ -138,14 +140,14 @@ public class VRTouchPadGestureDetector extends Object implements
     }
 
     public VRTouchPadGestureDetector(Context context,
-            VRTouchPadGestureDetector.OnTouchPadGestureListener listener) {
+                                     VRTouchPadGestureDetector.OnTouchPadGestureListener listener) {
         gestureDetector = new GestureDetector(context, this);
         gestureListener = listener;
     }
 
     public VRTouchPadGestureDetector(Context context,
-            VRTouchPadGestureDetector.OnTouchPadGestureListener listener,
-            Handler handler) {
+                                     VRTouchPadGestureDetector.OnTouchPadGestureListener listener,
+                                     Handler handler) {
         gestureDetector = new GestureDetector(context, this, handler);
         gestureListener = listener;
     }
@@ -163,7 +165,7 @@ public class VRTouchPadGestureDetector extends Object implements
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-            float velocityY) {
+                           float velocityY) {
         if (gestureDetector == null)
             return false;
 
@@ -220,7 +222,11 @@ public class VRTouchPadGestureDetector extends Object implements
 
     @Override
     public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2,
-            float arg3) {
+                            float arg3) {
+        if (gestureListener != null) {
+            return gestureListener.onScroll(arg0, arg1, arg2, arg3);
+        }
+
         return false;
     }
 
@@ -236,7 +242,7 @@ public class VRTouchPadGestureDetector extends Object implements
     /**
      * Analyzes the given motion event and if applicable triggers the
      * appropriate callbacks on the {@link OnGestureListener} supplied.
-     * 
+     *
      * @param ev
      *            The current motion event.
      * @return true if the {@link OnGestureListener} consumed the event, else

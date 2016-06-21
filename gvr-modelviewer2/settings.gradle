@@ -1,1 +1,1 @@
-include ':framework'include ':modelviewer2'project(':framework').projectDir = new File('../../GearVRf/GVRf/Framework/framework')
+include ':framework'include ':widget_plugin'include ':modelviewer2'project(':framework').projectDir = new File('../../GearVRf/GVRf/Framework/framework')project(':widget_plugin').projectDir = new File('../../GearVRf/GVRf/Extensions/Widget_plugin')

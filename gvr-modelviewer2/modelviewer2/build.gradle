@@ -5,7 +5,8 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "com.samsung.android.gvr.sample"
+        //applicationId "com.samsung.android.gvr.sample"
+        applicationId "org.gearvrf.ModelViewer2Activity"
         minSdkVersion 19
         targetSdkVersion 19
     }
@@ -25,4 +26,5 @@ android {
 
 dependencies {
     compile project(':framework')
+    compile project(':widget_plugin')
 }

@@ -15,71 +15,49 @@
 
 package org.gearvrf.modelviewer2;
 
-import android.content.Intent;
-
+import org.gearvrf.scene_objects.view.GVRFrameLayout;
 import org.gearvrf.util.VRTouchPadGestureDetector;
 import org.gearvrf.util.VRTouchPadGestureDetector.OnTouchPadGestureListener;
 import org.gearvrf.util.VRTouchPadGestureDetector.SwipeDirection;
-
 import org.gearvrf.GVRActivity;
+import org.gearvrf.widgetplugin.GVRWidgetPlugin;
+
 import android.os.Bundle;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.util.Log;
+import android.widget.Button;
 
 public class ModelViewer2Activity extends GVRActivity implements
         OnTouchPadGestureListener {
 
+    private GVRWidgetPlugin mPlugin= new GVRWidgetPlugin(this);
     private VRTouchPadGestureDetector mDetector = null;
     private ModelViewer2Manager mManager = null;
+    private GVRFrameLayout frameLayout;
+    private Button button1, button2;
+    MyMenu mWidget;
 
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        mPlugin.setViewSize(displaymetrics.widthPixels,
+                displaymetrics.heightPixels);
+
         mDetector = new VRTouchPadGestureDetector(this);
-        mManager = new ModelViewer2Manager();
+        mWidget = new MyMenu();
+        mManager = new ModelViewer2Manager(mPlugin);
+        mPlugin.setCurrentScript(mManager);
+        mWidget.mManager = mManager;
         setScript(mManager, "gvr.xml");
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.v("", "requestCode : " + requestCode);
-        Log.v("", "resultCode : " + resultCode);
-        Log.v("", "data : " + data.getDataString());
-
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onBackPressed() {}
-
-    @Override
-    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
-        return super.onKeyLongPress(keyCode, event);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        mDetector.onTouchEvent(event);
-        return super.onTouchEvent(event);
-    }
-
-    @Override
     public boolean onSingleTap(MotionEvent e) {
-        Log.v("", "onSingleTap");
+        Log.e("Abhijit", "onSingleTap");
         mManager.onSingleTap(e);
         return false;
     }
@@ -96,4 +74,31 @@ public class ModelViewer2Activity extends GVRActivity implements
         mManager.onSwipe(e, swipeDirection, velocityX, velocityY);
         return false;
     }
+
+    @Override
+    public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2, float arg3) {
+        mManager.onScroll(arg0, arg1, arg2, arg3);
+        return false;
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        mDetector.onTouchEvent(event);
+        if (mPlugin.getWidgetView() == null)
+            return false;
+
+        return mPlugin.dispatchTouchEvent(event);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        mPlugin.initializeWidget(mWidget);
+        super.onResume();
+    }
+
 }
