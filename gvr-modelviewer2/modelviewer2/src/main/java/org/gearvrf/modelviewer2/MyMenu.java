@@ -16,6 +16,7 @@
 package org.gearvrf.modelviewer2;
 
 
+
 import org.gearvrf.utility.Log;
 import org.gearvrf.widgetplugin.GVRWidget;
 
@@ -35,6 +36,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox.SelectBoxStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -52,10 +54,14 @@ public class MyMenu extends GVRWidget {
     float mFontScale = 6.0f;
     Skin skin;
 
+    int flagIfModelAlreadyLoaded = 0;
+
     public void create(){
         mStage = new Stage();
         skin = new Skin(Gdx.files.internal("data/uiskin.json"));
         Gdx.input.setInputProcessor(mStage);
+
+
 
         // Parent Table contains all child tables
         mContainer = new Table();
@@ -74,7 +80,9 @@ public class MyMenu extends GVRWidget {
             }
         };
 
-        childTable.pad(0).defaults().expandX().space(10);
+
+
+
 
         childTable.row();
         childTable.add(new Label("", skin)).expandX().fillX();
@@ -152,16 +160,23 @@ public class MyMenu extends GVRWidget {
         slider = new Slider(0, 100, 1, false, skin);
         slider.setName("Zoom");
         slider.setVisible(true);
-        slider.setValue(20);
-        //slider.addListener(stopTouchDown);
+        slider.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                float value = ((Slider)actor).getValue();
+              Log.e("Abhijit", "Value zoom" + ((Slider)actor).getValue());
+                //((Slider) actor).setValue(value);
+
+                mManager.zoomCurrentModel(value);
+            }
+        });
         Label zoom = new Label("  Zoom  ", skin);
         zoom.setFontScale(mFontScale);
         childTable.pad(10).add(zoom);
         childTable.add(slider).height(150.0f).width(800);
 
 
-        mContainer.add(scroll).expand().fill().colspan(4);
-        mContainer.row().space(10).padBottom(10);
+        mContainer.add(scroll).expand().fill().colspan(1);
+        mContainer.row().space(1).padBottom(1);
     }
 
     public void render() {
@@ -172,6 +187,27 @@ public class MyMenu extends GVRWidget {
         if(clickMeButton2.isChecked()){
             clickMeButton2.setChecked(false);
         }
+
+        // Enable Slider if Model is loaded
+        /*if(flagIfModelAlreadyLoaded == 0 && mManager.getCurrentDisplayedModel() != null){
+            Actor aSlider = mStage.getRoot().findActor("Zoom");
+            if(aSlider != null) {
+                ((Slider) aSlider).setVisible(true);
+                ((Slider) aSlider).setValue(0);
+            }
+            flagIfModelAlreadyLoaded = 1;
+        }
+
+        // Disable Slider if Model Not Present
+        if(mManager.getCurrentDisplayedModel() != null){
+            Actor aSlider = mStage.getRoot().findActor("Zoom");
+            if(aSlider != null)
+                ((Slider) aSlider).setVisible(true);
+
+            flagIfModelAlreadyLoaded = 0;
+        }*/
+
+
 
 
         /*Actor mColorButtonActor = mStage.getRoot().findActor("colorbutton");

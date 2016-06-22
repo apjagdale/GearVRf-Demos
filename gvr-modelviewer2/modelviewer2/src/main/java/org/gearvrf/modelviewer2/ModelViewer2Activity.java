@@ -84,6 +84,7 @@ public class ModelViewer2Activity extends GVRActivity implements
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         mDetector.onTouchEvent(event);
+
         if (mPlugin.getWidgetView() == null)
             return false;
 

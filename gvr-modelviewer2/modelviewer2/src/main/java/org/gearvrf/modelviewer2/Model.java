@@ -55,14 +55,14 @@ public class Model {
 
         try {
             // TODO Add Thumbnail Respective to the Model
-            icon = context.loadTexture(new GVRAndroidResource(context, "play-active.png"));
+            icon = context.loadTexture(new GVRAndroidResource(context, "default-thumbnail.png"));
         } catch (IOException e) {
             Log.e(TAG, "Unable to load texture");
             e.printStackTrace();
         }
 
         thumbnail = new GVRSceneObject(context, context.createQuad(4.5f, 4.5f), icon);
-        thumbnail.getRenderData().getMaterial().setTexture("inactive_back", icon);
+        thumbnail.getRenderData().getMaterial().setTexture("default-name", icon);
 
         // Adding Eye Pointee
         GVREyePointeeHolder playPauseHolder = new GVREyePointeeHolder(context);
