@@ -22,11 +22,16 @@ import org.gearvrf.util.VRTouchPadGestureDetector.SwipeDirection;
 import org.gearvrf.GVRActivity;
 import org.gearvrf.widgetplugin.GVRWidgetPlugin;
 
+import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.util.Log;
 import android.widget.Button;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class ModelViewer2Activity extends GVRActivity implements
         OnTouchPadGestureListener {
@@ -37,6 +42,24 @@ public class ModelViewer2Activity extends GVRActivity implements
     private GVRFrameLayout frameLayout;
     private Button button1, button2;
     MyMenu mWidget;
+
+
+    String[] getSkyBoxList(){
+        String skyBoxList[] = null;
+        try {
+            Resources res = getResources(); //if you are in an activity
+            AssetManager am = res.getAssets();
+            skyBoxList = am.list("skybox");
+            for ( int i = 0;i<skyBoxList.length;i++)
+            {
+                Log.d("",skyBoxList[i]);
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return skyBoxList;
+    }
+
 
 	@Override
 	protected void onCreate(Bundle icicle) {
@@ -49,10 +72,15 @@ public class ModelViewer2Activity extends GVRActivity implements
 
         mDetector = new VRTouchPadGestureDetector(this);
         mWidget = new MyMenu();
-        mManager = new ModelViewer2Manager(mPlugin);
+
+        //SkyBox List
+        mManager = new ModelViewer2Manager(mPlugin, getSkyBoxList());
         mPlugin.setCurrentScript(mManager);
         mWidget.mManager = mManager;
+
+
         setScript(mManager, "gvr.xml");
+
     }
 
     @Override

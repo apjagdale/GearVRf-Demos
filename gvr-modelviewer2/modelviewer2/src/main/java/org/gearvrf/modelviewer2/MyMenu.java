@@ -55,6 +55,7 @@ public class MyMenu extends GVRWidget {
     Skin skin;
 
     int flagIfModelAlreadyLoaded = 0;
+    boolean flagForSkyBox = true;
 
     public void create(){
         mStage = new Stage();
@@ -141,16 +142,13 @@ public class MyMenu extends GVRWidget {
                 skin.get(ListStyle.class));
 
         final SelectBox selectBox = new SelectBox(style);
-        selectBox.setName("colorbutton");
+        selectBox.setName("SkyBoxType");
         selectBox.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-               // mScript.mTexColor = selectBox.getSelectedIndex() + 1;
-
+                mManager.addSkyBox(selectBox.getSelectedIndex());
             }
         });
 
-        selectBox.setItems("Animation List", "Cold", "Hot");
-        selectBox.setSelected("Animation List");
         selectBox.setVisible(true);
         childTable.add(selectBox).height(120.0f * 2 ).width(600.0f);
 
@@ -188,6 +186,11 @@ public class MyMenu extends GVRWidget {
             clickMeButton2.setChecked(false);
         }
 
+        if(flagForSkyBox){
+            Actor tempActor = mStage.getRoot().findActor("SkyBoxType");
+            ((SelectBox) tempActor).setItems(mManager.getSkyBoxList());
+            flagForSkyBox = false;
+        }
         // Enable Slider if Model is loaded
         /*if(flagIfModelAlreadyLoaded == 0 && mManager.getCurrentDisplayedModel() != null){
             Actor aSlider = mStage.getRoot().findActor("Zoom");
