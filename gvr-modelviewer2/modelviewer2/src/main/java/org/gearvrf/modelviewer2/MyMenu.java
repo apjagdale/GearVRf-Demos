@@ -44,6 +44,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
+import java.util.ArrayList;
+
 public class MyMenu extends GVRWidget {
 
     private Stage mStage;
@@ -56,6 +58,7 @@ public class MyMenu extends GVRWidget {
 
     int flagIfModelAlreadyLoaded = 0;
     boolean flagForSkyBox = true;
+    boolean flagForCameraPosition = true;
 
     public void create(){
         mStage = new Stage();
@@ -88,22 +91,27 @@ public class MyMenu extends GVRWidget {
         childTable.row();
         childTable.add(new Label("", skin)).expandX().fillX();
 
-        // Adding Button
-        TextButton button = null;
-        button = new TextButton("  Next  ", skin);
-        button.getLabel().setFontScale(mFontScale);
-        button.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y) {
-                System.out.println("click " + x + ", " + y);
-                Log.e("Abhijit", "Got clicked");
-                clickMeButton.setChecked(false);
+        // Adding Position Select Box
+        childTable.row();
+        BitmapFont f = skin.getFont("default-font");
+        f.getData().setScale(mFontScale - 1.0f);
+
+        childTable.add(new Label("", skin)).expandX().fillX();
+        SelectBoxStyle style = new SelectBoxStyle(f, Color.WHITE,
+                skin.getDrawable("default-select"),
+                skin.get(ScrollPaneStyle.class),
+                skin.get(ListStyle.class));
+
+        final SelectBox selectBoxCP = new SelectBox(style);
+        selectBoxCP.setName("CameraPostionType");
+        selectBoxCP.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                mManager.changeCameraPosition(selectBoxCP.getSelectedIndex());
             }
         });
 
-        clickMeButton = button;
-        clickMeButton.setVisible(true);
-
-        childTable.add(button).height(200).width(450);
+        selectBoxCP.setVisible(true);
+        childTable.add(selectBoxCP).height(120.0f * 2 ).width(600.0f);
 
 
 
@@ -113,7 +121,7 @@ public class MyMenu extends GVRWidget {
         childTable.add(new Label("", skin)).expandX().fillX();
 
         // Adding Button
-        button = new TextButton("  Button2  ", skin);
+        TextButton button = new TextButton("  Button2  ", skin);
         button.getLabel().setFontScale(mFontScale);
         clickMeButton2 = button;
         clickMeButton2.setName("clickMeButton2Name");
@@ -132,14 +140,14 @@ public class MyMenu extends GVRWidget {
 
         // Adding Animation Select Box
         childTable.row();
-        BitmapFont f = skin.getFont("default-font");
-        f.getData().setScale(mFontScale - 1.0f);
+        //BitmapFont f = skin.getFont("default-font");
+        //f.getData().setScale(mFontScale - 1.0f);
 
         childTable.add(new Label("", skin)).expandX().fillX();
-        SelectBoxStyle style = new SelectBoxStyle(f, Color.WHITE,
+        /*SelectBoxStyle style = new SelectBoxStyle(f, Color.WHITE,
                 skin.getDrawable("default-select"),
                 skin.get(ScrollPaneStyle.class),
-                skin.get(ListStyle.class));
+                skin.get(ListStyle.class));*/
 
         final SelectBox selectBox = new SelectBox(style);
         selectBox.setName("SkyBoxType");
@@ -190,6 +198,17 @@ public class MyMenu extends GVRWidget {
             Actor tempActor = mStage.getRoot().findActor("SkyBoxType");
             ((SelectBox) tempActor).setItems(mManager.getSkyBoxList());
             flagForSkyBox = false;
+        }
+
+        if(flagForCameraPosition){
+            Actor tempActor = mStage.getRoot().findActor("CameraPostionType");
+            ArrayList<String> list = mManager.getCameraPositionList();
+            String tempList[] = new String[list.size()];
+            for(int i = 0; i < list.size(); i++)
+                tempList[i] = list.get(i);
+
+            ((SelectBox) tempActor).setItems(tempList);
+            flagForCameraPosition = false;
         }
         // Enable Slider if Model is loaded
         /*if(flagIfModelAlreadyLoaded == 0 && mManager.getCurrentDisplayedModel() != null){

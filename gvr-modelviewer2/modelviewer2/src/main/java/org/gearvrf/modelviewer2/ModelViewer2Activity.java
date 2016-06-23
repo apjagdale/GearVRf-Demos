@@ -74,7 +74,7 @@ public class ModelViewer2Activity extends GVRActivity implements
         mWidget = new MyMenu();
 
         //SkyBox List
-        mManager = new ModelViewer2Manager(mPlugin, getSkyBoxList());
+        mManager = new ModelViewer2Manager(this, mPlugin, getSkyBoxList());
         mPlugin.setCurrentScript(mManager);
         mWidget.mManager = mManager;
 
