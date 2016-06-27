@@ -17,18 +17,35 @@ package org.gearvrf.modelviewer2;
 
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVRCustomMaterialShaderId;
+import org.gearvrf.GVRMaterialMap;
 import org.gearvrf.GVRMaterialShaderManager;
 
 public class ShaderHandler {
     private GVRCustomMaterialShaderId mShaderID;
     private GVRMaterialShaderManager mShaderManager;
+    private GVRMaterialMap mCustomShader;
+
+    private static final String VERTEX_SHADER = "uniform mat4 u_mvp;\n"
+            + "attribute vec4 a_position;\n"
+            + "void main() {\n"
+            + "gl_Position = u_mvp * a_position;\n"
+            + "}";
+
+    private static final String FRAGMENT_SHADER = "precision highp float;\n"
+            + "uniform vec4  u_color;\n"
+            + "void main() {\n"
+            + "gl_FragColor = vec4(1,1,0,1);\n"
+            + "}";
+
 
     public ShaderHandler(GVRContext gvrContext){
         mShaderManager = gvrContext.getMaterialShaderManager();
     }
 
     public void addVSandFS(String vertexShader, String fragmentShader){
-        mShaderID = mShaderManager.addShader(vertexShader, fragmentShader);
+        mShaderID = mShaderManager.addShader(VERTEX_SHADER, FRAGMENT_SHADER);
+        mCustomShader = mShaderManager.getShaderMap(mShaderID);
+        mCustomShader.addUniformVec4Key("u_color", "color");
     }
 
     public GVRCustomMaterialShaderId getShaderID(){

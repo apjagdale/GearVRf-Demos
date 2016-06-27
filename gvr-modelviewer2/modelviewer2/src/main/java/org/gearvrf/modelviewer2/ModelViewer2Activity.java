@@ -44,22 +44,6 @@ public class ModelViewer2Activity extends GVRActivity implements
     MyMenu mWidget;
 
 
-    String[] getSkyBoxList(){
-        String skyBoxList[] = null;
-        try {
-            Resources res = getResources(); //if you are in an activity
-            AssetManager am = res.getAssets();
-            skyBoxList = am.list("skybox");
-            for ( int i = 0;i<skyBoxList.length;i++)
-            {
-                Log.d("",skyBoxList[i]);
-            }
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        return skyBoxList;
-    }
-
 
 	@Override
 	protected void onCreate(Bundle icicle) {
@@ -74,7 +58,7 @@ public class ModelViewer2Activity extends GVRActivity implements
         mWidget = new MyMenu();
 
         //SkyBox List
-        mManager = new ModelViewer2Manager(this, mPlugin, getSkyBoxList());
+        mManager = new ModelViewer2Manager(this, mPlugin);
         mPlugin.setCurrentScript(mManager);
         mWidget.mManager = mManager;
 

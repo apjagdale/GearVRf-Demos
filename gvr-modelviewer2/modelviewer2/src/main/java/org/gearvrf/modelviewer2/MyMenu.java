@@ -106,7 +106,7 @@ public class MyMenu extends GVRWidget {
         selectBoxCP.setName("CameraPostionType");
         selectBoxCP.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                mManager.changeCameraPosition(selectBoxCP.getSelectedIndex());
+                mManager.setCameraPosition(selectBoxCP.getSelectedIndex());
             }
         });
 
@@ -194,13 +194,18 @@ public class MyMenu extends GVRWidget {
             clickMeButton2.setChecked(false);
         }
 
-        if(flagForSkyBox){
+        if(flagForSkyBox && mManager.controllerReadyFlag){
             Actor tempActor = mStage.getRoot().findActor("SkyBoxType");
-            ((SelectBox) tempActor).setItems(mManager.getSkyBoxList());
+            ArrayList<String> list = mManager.getSkyBoxList();
+            String tempList[] = new String[list.size()];
+            for(int i = 0; i < list.size(); i++)
+                tempList[i] = list.get(i);
+
+            ((SelectBox) tempActor).setItems(tempList);
             flagForSkyBox = false;
         }
 
-        if(flagForCameraPosition){
+        if(flagForCameraPosition && mManager.controllerReadyFlag){
             Actor tempActor = mStage.getRoot().findActor("CameraPostionType");
             ArrayList<String> list = mManager.getCameraPositionList();
             String tempList[] = new String[list.size()];
