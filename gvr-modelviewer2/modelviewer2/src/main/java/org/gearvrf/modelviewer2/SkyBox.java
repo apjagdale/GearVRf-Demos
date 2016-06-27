@@ -47,4 +47,31 @@ public class SkyBox {
             return skyBoxModel;
         }
     }
+
+    private GVRSphereSceneObject loadSkyBoxModelFromSD(GVRContext gvrContext, String skyBoxPath, String skyBoxName) {
+        GVRSphereSceneObject sphereObject = null;
+
+        // load texture
+        Future<GVRTexture> texture = null;
+        try {
+            texture = gvrContext.loadFutureTexture(new GVRAndroidResource(skyBoxPath + skyBoxName));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // create a sphere scene object with the specified texture and triangles facing inward (the 'false' argument)
+        sphereObject = new GVRSphereSceneObject(gvrContext, false, texture);
+        sphereObject.getTransform().setScale(2000, 2000, 2000);
+        return sphereObject;
+    }
+
+    public GVRSphereSceneObject getSkyBoxFromSD(GVRContext gvrContext, String skyBoxPath) {
+        if (skyBoxModel == null) {
+            skyBoxModel = loadSkyBoxModelFromSD(gvrContext, skyBoxPath, skyBoxName);
+            return skyBoxModel;
+        } else {
+            return skyBoxModel;
+        }
+    }
+
+
 }

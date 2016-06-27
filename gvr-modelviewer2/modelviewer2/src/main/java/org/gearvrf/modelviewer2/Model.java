@@ -106,19 +106,12 @@ public class Model {
         Vector3f max_corner = bv.maxCorner;
 
         // TODO Scale Approparetly
-        //   if (radius != Double.POSITIVE_INFINITY) {
-        float scaleFactor = 10 / radius;
-        model.getTransform().setScale(scaleFactor, scaleFactor, scaleFactor);
-        //   }
+        if (radius != Double.POSITIVE_INFINITY) {
+            float scaleFactor = 10 / radius;
+            model.getTransform().setScale(scaleFactor, scaleFactor, scaleFactor);
+        }
 
-        // After Scaling
-        bv = model.getBoundingVolume();
-        radius = bv.radius;
-        Log.e(TAG, "Radius" + Float.toString(radius));
-        min_corner = bv.minCorner;
-        max_corner = bv.maxCorner;
 
-        //model.getTransform().setPosition(0.0f, 200.0f, 980.0f);
         //After setting position
         bv = model.getBoundingVolume();
         radius = bv.radius;

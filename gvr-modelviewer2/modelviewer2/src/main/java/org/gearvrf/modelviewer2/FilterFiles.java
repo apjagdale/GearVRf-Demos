@@ -27,6 +27,7 @@ public class FilterFiles implements FilenameFilter {
     }
     @Override
     public boolean accept(File directory, String fileName) {
+        if(myExtension != null)
         for(String tExtension : myExtension) {
             if (fileName.endsWith(tExtension)) {
                 return true;
