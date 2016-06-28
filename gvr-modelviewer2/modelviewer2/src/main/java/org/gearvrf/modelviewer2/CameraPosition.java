@@ -1,36 +1,56 @@
 package org.gearvrf.modelviewer2;
 
 
+import org.gearvrf.GVRAndroidResource;
+import org.gearvrf.GVRContext;
+import org.gearvrf.GVREyePointee;
+import org.gearvrf.GVREyePointeeHolder;
+import org.gearvrf.GVRMeshEyePointee;
+import org.gearvrf.GVRSceneObject;
+import org.gearvrf.GVRTexture;
+import org.gearvrf.scene_objects.GVRSphereSceneObject;
+import org.gearvrf.util.BoundingBoxCreator;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.concurrent.Future;
 
 public class CameraPosition {
-    private ArrayList<Vector3f> listOfPositions = new ArrayList<Vector3f>();
+    private Vector3f position = new Vector3f();
     private int currentPositionIndex;
+    GVRSphereSceneObject sphereObject;
 
-    public CameraPosition(float defaultX, float defaultY, float defaultZ){
-        listOfPositions.add(new Vector3f(defaultX, defaultY, defaultZ));
-
-        addCameraPosition(defaultX - 3.0f, defaultY+100, defaultZ+300);
-        addCameraPosition(defaultX, defaultY + 5, defaultZ+200);
-        addCameraPosition(defaultX, defaultY+40, defaultZ + 100);
-        addCameraPosition(defaultX - 3.0f, defaultY+300, defaultZ+300);
-        addCameraPosition(defaultX -100, defaultY + 5, defaultZ+200);
-        addCameraPosition(defaultX - 200, defaultY+40, defaultZ + 100);
-
-        currentPositionIndex = 0;
+    public CameraPosition(float defaultX, float defaultY, float defaultZ) {
+        position = (new Vector3f(defaultX, defaultY, defaultZ));
     }
 
-    public void addCameraPosition(float newX, float newY, float newZ){
-        listOfPositions.add(new Vector3f(newX, newY, newZ));
+    public Vector3f getCameraPosition() {
+        return position;
     }
 
-    public Vector3f getIndexedCameraPosition(int index){
-        return listOfPositions.get(index);
+    public GVRSphereSceneObject loadNavigator(GVRContext context) {
+        // load texture
+        Future<GVRTexture> texture = null;
+        try {
+            texture = context.loadFutureTexture(new GVRAndroidResource(context, "skybox/skybox_outdoor.png"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // create a sphere scene object with the specified texture and triangles facing inward (the 'false' argument)
+        sphereObject = new GVRSphereSceneObject(context, false, texture);
+        sphereObject.getTransform().setScale(5, 5, 5);
+        attachEyePointee(context);
+
+        sphereObject.getTransform().setPosition(position.x, position.y, position.z);
+
+        return sphereObject;
     }
 
-    public ArrayList<Vector3f> getAllCameraPositions(){
-        return listOfPositions;
+    private void attachEyePointee(GVRContext context) {
+        GVRSceneObject.BoundingVolume bv = sphereObject.getBoundingVolume();
+        BoundingBoxCreator boundingBox = new BoundingBoxCreator(context, bv);
+        GVREyePointeeHolder playPauseHolder = new GVREyePointeeHolder(context);
+        playPauseHolder.addPointee(new GVRMeshEyePointee(context, boundingBox.getMesh()));
+        sphereObject.attachEyePointeeHolder(playPauseHolder);
     }
 }

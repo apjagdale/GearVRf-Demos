@@ -2,12 +2,14 @@ package org.gearvrf.modelviewer2;
 
 
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Environment;
 import android.util.Log;
 
 import org.gearvrf.GVRActivity;
 import org.gearvrf.GVRAndroidResource;
 import org.gearvrf.GVRContext;
+import org.gearvrf.GVREyePointee;
 import org.gearvrf.GVREyePointeeHolder;
 import org.gearvrf.GVRMaterial;
 import org.gearvrf.GVRMesh;
@@ -15,6 +17,7 @@ import org.gearvrf.GVRPicker;
 import org.gearvrf.GVRRenderData;
 import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
+import org.gearvrf.GVRTexture;
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRRotationByAxisAnimation;
 import org.gearvrf.scene_objects.GVRModelSceneObject;
@@ -25,6 +28,7 @@ import org.gearvrf.util.AssetsReader;
 import org.gearvrf.util.Banner;
 import org.gearvrf.util.BoundingBoxCreator;
 import org.gearvrf.widgetplugin.GVRWidgetSceneObject;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.io.File;
@@ -32,6 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.Future;
 
 public class Controller {
     private static final String TAG = "Abhijit";
@@ -45,7 +50,8 @@ public class Controller {
 
     // Variables related to Camera
     private Vector3f defaultCameraPosition = new Vector3f(0, 200, 1000);
-    private CameraPosition oDefaultCameraPosition;
+    private ArrayList<CameraPosition> oDefaultCameraPosition;
+    private CameraPosition oCurrentPosition;
 
     // Variables related to Model
     private final String sEnvironmentPath = Environment.getExternalStorageDirectory().getPath();
@@ -87,24 +93,62 @@ public class Controller {
 
     // START Camera Position Feature
     private void loadCameraPositionList() {
-        oDefaultCameraPosition = new CameraPosition(defaultCameraPosition.x, defaultCameraPosition.y, defaultCameraPosition.z);
+        oDefaultCameraPosition = new ArrayList<CameraPosition>();
+        oDefaultCameraPosition.add(new CameraPosition(defaultCameraPosition.x, defaultCameraPosition.y, defaultCameraPosition.z));
+        oDefaultCameraPosition.add(new CameraPosition(defaultCameraPosition.x, defaultCameraPosition.y, defaultCameraPosition.z - 150));
+        oDefaultCameraPosition.add(new CameraPosition(defaultCameraPosition.x, defaultCameraPosition.y - 50, defaultCameraPosition.z + 50));
+        oDefaultCameraPosition.add(new CameraPosition(defaultCameraPosition.x, defaultCameraPosition.y + 50, defaultCameraPosition.z));
+        oDefaultCameraPosition.add(new CameraPosition(defaultCameraPosition.x - 30.0f, defaultCameraPosition.y, defaultCameraPosition.z + 50));
+        oDefaultCameraPosition.add(new CameraPosition(defaultCameraPosition.x + 30, defaultCameraPosition.y, defaultCameraPosition.z + 50));
     }
 
     public ArrayList<String> getCameraPositionList() {
         ArrayList<String> list = new ArrayList<String>();
-        ArrayList<Vector3f> tempList = oDefaultCameraPosition.getAllCameraPositions();
-        for (Vector3f position : tempList) {
-            String sPosition = "X:" + Float.toString(position.x) + " Y:" + Float.toString(position.y) + " Z:" + Float.toString(position.z);
+        for (CameraPosition position : oDefaultCameraPosition) {
+            Vector3f coordinate = position.getCameraPosition();
+            String sPosition = "X:" + Float.toString(coordinate.x) + " Y:" + Float.toString(coordinate.y) + " Z:" + Float.toString(coordinate.z);
             list.add(sPosition);
         }
         return list;
     }
 
+    public void displayNavigators(GVRSceneObject room) {
+        oCurrentPosition = oDefaultCameraPosition.get(0);
+        oDefaultCameraPosition.get(0).loadNavigator(context);
+
+        for (int i = 1; i < oDefaultCameraPosition.size(); i++) {
+            GVRSphereSceneObject temp = oDefaultCameraPosition.get(i).loadNavigator(context);
+            room.addChildObject(temp);
+        }
+    }
+
     public void setCameraPosition(GVRScene scene, GVRWidgetSceneObject widget, int index) {
-        Vector3f position = oDefaultCameraPosition.getIndexedCameraPosition(index);
+        Vector3f position = oDefaultCameraPosition.get(index).getCameraPosition();
         scene.getMainCameraRig().getTransform().setPosition(position.x, position.y, position.z);
         if (widget != null)
             widget.getTransform().setPosition(position.x - 3.0f, position.y, position.z - 5);
+    }
+
+    public void setCameraPositionByNavigator(GVREyePointeeHolder picked, GVRScene scene, GVRSceneObject room, GVRWidgetSceneObject widget) {
+        for (int i = 0; i < oDefaultCameraPosition.size(); i++) {
+            if (picked.equals(oDefaultCameraPosition.get(i).sphereObject.getEyePointeeHolder())) {
+                Vector3f coordinates = oDefaultCameraPosition.get(i).getCameraPosition();
+                scene.getMainCameraRig().getTransform().setPosition(coordinates.x, coordinates.y, coordinates.z);
+
+                if (oCurrentPosition != null) {
+                    room.addChildObject(oCurrentPosition.loadNavigator(context));
+                }
+
+                Log.e(TAG, "REmoving navigator " + Integer.toString(i));
+                room.removeChildObject(oDefaultCameraPosition.get(i).sphereObject);
+                oCurrentPosition = oDefaultCameraPosition.get(i);
+                scene.bindShaders();
+
+                if (widget != null)
+                    widget.getTransform().setPosition(coordinates.x - 3.0f, coordinates.y, coordinates.z - 5);
+
+            }
+        }
     }
     // END Camera Position Feature
 
@@ -140,6 +184,7 @@ public class Controller {
             1. Create its thumbNail and text
             2. Add Eye Pointee for thumbnail
     */
+
     void loadModelsList() {
         aModel = new ArrayList<Model>();
         ArrayList<String> listOfAllModels = getListOfModels();
@@ -164,7 +209,6 @@ public class Controller {
             animation = new GVRRotationByAxisAnimation(currentThumbNailsInRoom.get(i), 2, 360, 0, 1, 0).start(context.getAnimationEngine());
             //animation.setRepeatMode(1);
             animation.setRepeatCount(-1);
-
             aAnimation.add(animation);
         }
 
@@ -295,15 +339,15 @@ public class Controller {
         ArrayList<String> extensions = new ArrayList<String>();
         extensions.add(".png");
 
-        CardReader cRObject = new CardReader(sEnvironmentPath + "/" +sSDSkyBoxDirectory + "/", extensions);
+        CardReader cRObject = new CardReader(sEnvironmentPath + "/" + sSDSkyBoxDirectory + "/", extensions);
         File list[] = cRObject.getModels();
 
         aOSDSkyBox = new ArrayList<SkyBox>();
 
-        if(list != null)
-        for (File sSkyBoxName : list) {
-            aOSDSkyBox.add(new SkyBox(sSkyBoxName.getName()));
-        }
+        if (list != null)
+            for (File sSkyBoxName : list) {
+                aOSDSkyBox.add(new SkyBox(sSkyBoxName.getName()));
+            }
     }
 
     void loadDefaultSkyBoxList() {
@@ -324,10 +368,10 @@ public class Controller {
         }
 
         // SDCard SkyBox List
-        if(aOSDSkyBox != null)
-        for (SkyBox oSkyBox : aOSDSkyBox) {
-            sAEntireList.add(oSkyBox.getSkyBoxName());
-        }
+        if (aOSDSkyBox != null)
+            for (SkyBox oSkyBox : aOSDSkyBox) {
+                sAEntireList.add(oSkyBox.getSkyBoxName());
+            }
 
         return sAEntireList;
     }
@@ -342,7 +386,7 @@ public class Controller {
         if (index < count) {
             current = aODefaultSkyBox.get(index).getSkyBox(context, sDefaultSkyBoxDirectory + "/");
         } else {
-            current = aOSDSkyBox.get(index - count).getSkyBoxFromSD(context, sEnvironmentPath + "/" +sSDSkyBoxDirectory + "/");
+            current = aOSDSkyBox.get(index - count).getSkyBoxFromSD(context, sEnvironmentPath + "/" + sSDSkyBoxDirectory + "/");
         }
 
         if (current != null) {
