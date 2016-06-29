@@ -8,6 +8,7 @@ import android.util.Log;
 
 import org.gearvrf.GVRActivity;
 import org.gearvrf.GVRAndroidResource;
+import org.gearvrf.GVRComponent;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVREyePointee;
 import org.gearvrf.GVREyePointeeHolder;
@@ -18,6 +19,7 @@ import org.gearvrf.GVRRenderData;
 import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
 import org.gearvrf.GVRTexture;
+import org.gearvrf.GVRTransform;
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRRotationByAxisAnimation;
 import org.gearvrf.scene_objects.GVRModelSceneObject;
@@ -27,6 +29,7 @@ import org.gearvrf.util.AccessibilitySceneShader;
 import org.gearvrf.util.AssetsReader;
 import org.gearvrf.util.Banner;
 import org.gearvrf.util.BoundingBoxCreator;
+import org.gearvrf.util.NoTextureShader;
 import org.gearvrf.widgetplugin.GVRWidgetSceneObject;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -142,7 +145,7 @@ public class Controller {
                 Log.e(TAG, "REmoving navigator " + Integer.toString(i));
                 room.removeChildObject(oDefaultCameraPosition.get(i).sphereObject);
                 oCurrentPosition = oDefaultCameraPosition.get(i);
-                scene.bindShaders();
+
 
                 if (widget != null)
                     widget.getTransform().setPosition(coordinates.x - 3.0f, coordinates.y, coordinates.z - 5);
@@ -262,8 +265,10 @@ public class Controller {
 
             // Set Camera Position to Default
             // Reset Camera Position to Default
+            // Remove Sphere of Default Camera View
             scene.getMainCameraRig().getTransform().setPosition(defaultCameraPosition.x, defaultCameraPosition.y, defaultCameraPosition.z);
-            widget.getTransform().setPosition(defaultCameraPosition.x - 3.0f, defaultCameraPosition.y, defaultCameraPosition.z - 5);
+            //widget.getTransform().setPosition(defaultCameraPosition.x - 3.0f, defaultCameraPosition.y, defaultCameraPosition.z - 5);
+            setCameraPositionByNavigator(oDefaultCameraPosition.get(0).sphereObject.getEyePointeeHolder(), scene, room, widget);
 
             Log.e(TAG, "TApped on Model so displaying THumbNail");
             // Add ThumbNails already present before
@@ -271,6 +276,8 @@ public class Controller {
                 room.addChildObject(thumbnail);
             }
             currentDisplayedModel = null;
+
+
             return;
         } else {
             for (int index = 0; index < aModel.size(); index++) {
@@ -286,7 +293,7 @@ public class Controller {
                         room.addChildObject(tempModelSO);
 
                         // Custom Shader
-                        applyCustomShader(tempModelSO);
+                       // applyCustomShader(tempModelSO);
                         Log.d(TAG, "Loading Done");
                         currentDisplayedModel = aModel.get(index);
                         scene.bindShaders();
@@ -404,7 +411,13 @@ public class Controller {
 
     // START Custom Shader Features
     private void applyCustomShader(GVRSceneObject skyBox) {
-        AccessibilitySceneShader shader = new AccessibilitySceneShader(context);
+        ArrayList<GVRRenderData> renderDatas = skyBox.getAllComponents(GVRRenderData.getComponentType());
+        for (GVRComponent c : renderDatas) {
+            GVRRenderData rdata = (GVRRenderData) c;
+            rdata.setShaderTemplate(NoTextureShader.class);
+        }
+
+      //  AccessibilitySceneShader shader = new AccessibilitySceneShader(context);
         //skyBox.detachRenderData();
         // applyShader(shader, skyBox);
         // GVRRenderData renderData = new GVRRenderData(mGVRContext);
@@ -422,7 +435,7 @@ public class Controller {
 
         skyBox.attachRenderData(renderData);*/
 
-        Queue<GVRSceneObject> all = new LinkedList<GVRSceneObject>();
+  /*      Queue<GVRSceneObject> all = new LinkedList<GVRSceneObject>();
 
         //applyShader(shader, skyBox);
         for (int i = 0; i < skyBox.getChildrenCount(); i++) {
@@ -436,7 +449,7 @@ public class Controller {
                 all.add(temp.getChildByIndex(i));
             }
         }
-
+*/
        /* for (GVRSceneObject object : skyBox.getChildren()) {
             Log.e(TAG, "ChildFound");
             //applyShader(shader, object);

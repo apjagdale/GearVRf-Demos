@@ -38,7 +38,7 @@ public class CameraPosition {
         }
         // create a sphere scene object with the specified texture and triangles facing inward (the 'false' argument)
         sphereObject = new GVRSphereSceneObject(context, false, texture);
-        sphereObject.getTransform().setScale(5, 5, 5);
+        sphereObject.getTransform().setScale(2, 2, 2);
         attachEyePointee(context);
 
         sphereObject.getTransform().setPosition(position.x, position.y, position.z);
