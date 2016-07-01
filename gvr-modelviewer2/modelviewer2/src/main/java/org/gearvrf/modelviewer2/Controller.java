@@ -2,44 +2,32 @@ package org.gearvrf.modelviewer2;
 
 
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Environment;
 import android.util.Log;
 
 import org.gearvrf.GVRActivity;
-import org.gearvrf.GVRAndroidResource;
-import org.gearvrf.GVRComponent;
 import org.gearvrf.GVRContext;
-import org.gearvrf.GVREyePointee;
 import org.gearvrf.GVREyePointeeHolder;
 import org.gearvrf.GVRMaterial;
 import org.gearvrf.GVRMesh;
-import org.gearvrf.GVRPicker;
+import org.gearvrf.GVRPhongShader;
 import org.gearvrf.GVRRenderData;
+import org.gearvrf.GVRRenderPass;
 import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
-import org.gearvrf.GVRTexture;
-import org.gearvrf.GVRTransform;
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRRotationByAxisAnimation;
 import org.gearvrf.scene_objects.GVRModelSceneObject;
 import org.gearvrf.scene_objects.GVRSphereSceneObject;
-import org.gearvrf.scene_objects.GVRTextViewSceneObject;
-import org.gearvrf.util.AccessibilitySceneShader;
 import org.gearvrf.util.AssetsReader;
 import org.gearvrf.util.Banner;
-import org.gearvrf.util.BoundingBoxCreator;
 import org.gearvrf.util.NoTextureShader;
+import org.gearvrf.util.OutlineShader;
 import org.gearvrf.widgetplugin.GVRWidgetSceneObject;
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.concurrent.Future;
 
 public class Controller {
     private static final String TAG = "Abhijit";
@@ -67,6 +55,8 @@ public class Controller {
     // Variables related to Banner
     private Banner oBannerCount;
 
+    // Variables related to Custom Shader
+    private ArrayList<String> aSCustomShaderList;
 
     private GVRActivity activity;
     private GVRContext context;
@@ -82,7 +72,70 @@ public class Controller {
 
         loadModelsList();
         loadCameraPositionList();
+        loadCustomShaderList();
     }
+
+    // START Custom Shader Feature
+    private void loadCustomShaderList() {
+        aSCustomShaderList = new ArrayList<String>();
+        aSCustomShaderList.add("Original");
+        aSCustomShaderList.add("No Texture");
+        aSCustomShaderList.add("Outline");
+        aSCustomShaderList.add("Lines");
+    }
+
+    public ArrayList<String> getListOfCustomShaders() {
+        return aSCustomShaderList;
+    }
+
+  //  ArrayList<GVRMaterial> temp;
+    public void applyCustomShader(int index, GVRScene scene) {
+        if(currentDisplayedModel == null)
+            return;
+        ArrayList<GVRRenderData> renderDatas = currentDisplayedModel.getModel(context).getAllComponents(GVRRenderData.getComponentType());
+        GVRMaterial outlineMaterial = new GVRMaterial(context);
+
+
+        switch (index) {
+            case 0:
+                for (int i = 0; i < renderDatas.size(); i++) {
+                    renderDatas.get(i).setMaterial(currentDisplayedModel.originalMaterial.get(i));
+                    renderDatas.get(i).setShaderTemplate(GVRPhongShader.class);
+                    renderDatas.get(i).setCullFace(GVRRenderPass.GVRCullFaceEnum.Back);
+                    renderDatas.get(i).setDrawMode(4);
+                }
+                break;
+            case 1:
+                for (GVRRenderData rdata : renderDatas) {
+                    rdata.setShaderTemplate(NoTextureShader.class);
+                    rdata.setDrawMode(4);
+                }
+                break;
+
+            case 2:
+                outlineMaterial.setVec4(OutlineShader.COLOR_KEY, 0.4f, 0.1725f, 0.1725f, 1.0f);
+                outlineMaterial.setFloat(OutlineShader.THICKNESS_KEY, 2.0f);
+                //temp = new ArrayList<GVRMaterial>();
+                for (GVRRenderData rdata : renderDatas) {
+                    //temp.add(rdata.getMaterial());
+                    rdata.setMaterial(outlineMaterial);
+                    rdata.setShaderTemplate(OutlineShader.class);
+                    rdata.setCullFace(GVRRenderPass.GVRCullFaceEnum.Front);
+                    rdata.setDrawMode(4);
+                }
+                break;
+            case 3:
+                for (GVRRenderData rdata : renderDatas) {
+                    rdata.setShaderTemplate(GVRPhongShader.class);
+                    rdata.setDrawMode(1);
+                }
+
+                break;
+        }
+
+        scene.bindShaders();
+    }
+    // END Custom Shader Feature
 
     // START Banner Feature
     void displayCountInRoom(GVRModelSceneObject room) {
@@ -293,7 +346,7 @@ public class Controller {
                         room.addChildObject(tempModelSO);
 
                         // Custom Shader
-                       // applyCustomShader(tempModelSO);
+                        //applyCustomShader(tempModelSO);
                         Log.d(TAG, "Loading Done");
                         currentDisplayedModel = aModel.get(index);
                         scene.bindShaders();
@@ -407,103 +460,5 @@ public class Controller {
     }
 
     // END SkyBox Features
-
-
-    // START Custom Shader Features
-    private void applyCustomShader(GVRSceneObject skyBox) {
-        ArrayList<GVRRenderData> renderDatas = skyBox.getAllComponents(GVRRenderData.getComponentType());
-        for (GVRComponent c : renderDatas) {
-            GVRRenderData rdata = (GVRRenderData) c;
-            rdata.setShaderTemplate(NoTextureShader.class);
-        }
-
-      //  AccessibilitySceneShader shader = new AccessibilitySceneShader(context);
-        //skyBox.detachRenderData();
-        // applyShader(shader, skyBox);
-        // GVRRenderData renderData = new GVRRenderData(mGVRContext);
-
-
-        // Adding Pointee to Model
-/*        GVRSceneObject.BoundingVolume bv = skyBox.getBoundingVolume();
-        BoundingBoxCreator boundingBox = new BoundingBoxCreator(mGVRContext, bv);
-
-        GVRMesh mesh = boundingBox.getMesh();
-
-        GVRMaterial mat = new GVRMaterial(mGVRContext, shader.getShaderId());
-        renderData.setMesh(mesh);
-        renderData.setMaterial(mat);
-
-        skyBox.attachRenderData(renderData);*/
-
-  /*      Queue<GVRSceneObject> all = new LinkedList<GVRSceneObject>();
-
-        //applyShader(shader, skyBox);
-        for (int i = 0; i < skyBox.getChildrenCount(); i++) {
-            all.add(skyBox.getChildByIndex(i));
-        }
-
-        while (all.size() != 0) {
-            GVRSceneObject temp = all.remove();
-            applyShader(shader, temp);
-            for (int i = 0; i < temp.getChildrenCount(); i++) {
-                all.add(temp.getChildByIndex(i));
-            }
-        }
-*/
-       /* for (GVRSceneObject object : skyBox.getChildren()) {
-            Log.e(TAG, "ChildFound");
-            //applyShader(shader, object);
-
-            GVRRenderData renderData2 = new GVRRenderData(mGVRContext);
-
-         //   GVRSceneObject.BoundingVolume bv = object.getBoundingVolume();
-         //   BoundingBoxCreator boundingBox2 = new BoundingBoxCreator(mGVRContext, bv);
-
-         //   GVRMesh mesh2 = boundingBox2.getMesh();
-
-            if(object.getRenderData() != null){
-            if(object.getRenderData().getMesh() != null) {
-                Log.e(TAG, "ChildFound with Mesh");
-                GVRMesh mesh2 = object.getRenderData().getMesh();
-                GVRMaterial mat2 = new GVRMaterial(mGVRContext, shader.getShaderId());
-                renderData2.setMesh(mesh2);
-                renderData2.setMaterial(mat2);
-
-                object.attachRenderData(renderData2);
-            }
-            else{
-                Log.e(TAG, "ChildFound but no mesh");
-            }}
-            else{
-                Log.e(TAG, "ChildFound but no mesh");
-            }
-        }*/
-    }
-
-    private void applyShader(AccessibilitySceneShader shader, GVRSceneObject object) {
-        if (object != null && object.getRenderData() != null && object.getRenderData().getMaterial() != null) {
-            Log.e(TAG, "Render data foundd");
-            //object.getRenderData().getMaterial().setShaderType(shader.getShaderId());
-/*
-            GVRSceneObject.BoundingVolume bv = object.getBoundingVolume();
-            BoundingBoxCreator boundingBox2 = new BoundingBoxCreator(context, bv);
-            GVRRenderData renderData2 = new GVRRenderData(context);
-            GVRMaterial mat2 = new GVRMaterial(context, shader.getShaderId());
-            renderData2.setMesh(boundingBox2.getMesh());
-            renderData2.setMaterial(mat2);
-            object.attachRenderData(renderData2);*/
-
-
-            GVRRenderData renderData = new GVRRenderData(context);
-            GVRMesh mesh = object.getRenderData().getMesh();
-
-            GVRMaterial mat = new GVRMaterial(context, shader.getShaderId());
-            renderData.setMesh(mesh);
-            renderData.setMaterial(mat);
-
-            object.attachRenderData(renderData);
-
-        }
-    }
-    // END Custom Shader Features
+    
 }

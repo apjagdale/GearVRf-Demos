@@ -23,8 +23,7 @@ public class NoTextureShader extends GVRPhongShader {
 
     public NoTextureShader(GVRContext gvrContext) {
         super(gvrContext);
-        if (surfShader == null)
-        {
+        if (surfShader == null) {
             Context context = gvrContext.getContext();
             surfShader = TextFile.readTextFile(context, R.raw.notexture_surface);
             setSegment("FragmentSurface", surfShader);

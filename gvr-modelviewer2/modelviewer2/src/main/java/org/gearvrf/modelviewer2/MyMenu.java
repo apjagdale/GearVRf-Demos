@@ -58,7 +58,7 @@ public class MyMenu extends GVRWidget {
 
     int flagIfModelAlreadyLoaded = 0;
     boolean flagForSkyBox = true;
-    boolean flagForCameraPosition = true;
+    boolean flagForCustomShader = true;
 
     public void create(){
         mStage = new Stage();
@@ -89,7 +89,7 @@ public class MyMenu extends GVRWidget {
 
 
         childTable.row();
-        childTable.add(new Label("", skin)).expandX().fillX();
+        //childTable.add(new Label("", skin)).expandX().fillX();
 
         // Adding Position Select Box
         childTable.row();
@@ -103,10 +103,10 @@ public class MyMenu extends GVRWidget {
                 skin.get(ListStyle.class));
 
         final SelectBox selectBoxCP = new SelectBox(style);
-        selectBoxCP.setName("CameraPostionType");
+        selectBoxCP.setName("CustomShaderType");
         selectBoxCP.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                mManager.setCameraPosition(selectBoxCP.getSelectedIndex());
+                mManager.setSelectedCustomShader(selectBoxCP.getSelectedIndex());
             }
         });
 
@@ -118,7 +118,7 @@ public class MyMenu extends GVRWidget {
         // Button 2
         childTable.row();
         childTable.row();
-        childTable.add(new Label("", skin)).expandX().fillX();
+        //childTable.add(new Label("", skin)).expandX().fillX();
 
         // Adding Button
         TextButton button = new TextButton("  Button2  ", skin);
@@ -143,7 +143,7 @@ public class MyMenu extends GVRWidget {
         //BitmapFont f = skin.getFont("default-font");
         //f.getData().setScale(mFontScale - 1.0f);
 
-        childTable.add(new Label("", skin)).expandX().fillX();
+       // childTable.add(new Label("", skin)).expandX().fillX();
         /*SelectBoxStyle style = new SelectBoxStyle(f, Color.WHITE,
                 skin.getDrawable("default-select"),
                 skin.get(ScrollPaneStyle.class),
@@ -205,15 +205,15 @@ public class MyMenu extends GVRWidget {
             flagForSkyBox = false;
         }
 
-        if(flagForCameraPosition && mManager.controllerReadyFlag){
-            Actor tempActor = mStage.getRoot().findActor("CameraPostionType");
-            ArrayList<String> list = mManager.getCameraPositionList();
+        if(flagForCustomShader && mManager.controllerReadyFlag){
+            Actor tempActor = mStage.getRoot().findActor("CustomShaderType");
+            ArrayList<String> list = mManager.getListOfCustomShaders();
             String tempList[] = new String[list.size()];
             for(int i = 0; i < list.size(); i++)
                 tempList[i] = list.get(i);
 
             ((SelectBox) tempActor).setItems(tempList);
-            flagForCameraPosition = false;
+            flagForCustomShader = false;
         }
         // Enable Slider if Model is loaded
         /*if(flagIfModelAlreadyLoaded == 0 && mManager.getCurrentDisplayedModel() != null){
