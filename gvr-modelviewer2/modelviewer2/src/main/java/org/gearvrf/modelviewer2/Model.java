@@ -23,11 +23,13 @@ import org.gearvrf.GVRAndroidResource;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVREyePointeeHolder;
 import org.gearvrf.GVRMaterial;
+import org.gearvrf.GVRMesh;
 import org.gearvrf.GVRMeshEyePointee;
 import org.gearvrf.GVRRenderData;
 import org.gearvrf.GVRSceneObject;
 import org.gearvrf.GVRTexture;
 import org.gearvrf.scene_objects.GVRTextViewSceneObject;
+import org.gearvrf.util.AccessibilitySceneShader;
 import org.gearvrf.util.BoundingBoxCreator;
 import org.joml.Vector3f;
 
@@ -107,22 +109,29 @@ public class Model {
             Log.e(TAG, "Unable to load model");
         }
 
-        // Adding Pointee to Model
         GVRSceneObject.BoundingVolume bv = model.getBoundingVolume();
+        BoundingBoxCreator boundingBox = new BoundingBoxCreator(context, bv);
+        GVREyePointeeHolder playPauseHolder = new GVREyePointeeHolder(context);
+        playPauseHolder.addPointee(new GVRMeshEyePointee(context, boundingBox.getMesh()));
+        model.attachEyePointeeHolder(playPauseHolder);
+
+
+        // Adding Pointee to Model
+        /*GVRSceneObject.BoundingVolume*/ bv = model.getBoundingVolume();
         Float radius = bv.radius;
         Log.e(TAG, "Radius" + Float.toString(radius));
         Vector3f min_corner = bv.minCorner;
         Vector3f max_corner = bv.maxCorner;
 
            // TODO Scale Approparetly
-        if (radius != Double.POSITIVE_INFINITY) {
+        if (radius > 10.0f) {
             float scaleFactor = 10 / radius;
             model.getTransform().setScale(scaleFactor, scaleFactor, scaleFactor);
         }
 
 
         //After setting position
-        bv = model.getBoundingVolume();
+ /*       bv = model.getBoundingVolume();
         radius = bv.radius;
         Log.e(TAG, "Radius" + Float.toString(radius));
         min_corner = bv.minCorner;
@@ -135,13 +144,14 @@ public class Model {
         model.attachEyePointeeHolder(playPauseHolder);
 
         // Just to check bounding range
-  /*      AccessibilitySceneShader shader = new AccessibilitySceneShader(context);
+        AccessibilitySceneShader shader = new AccessibilitySceneShader(context);
         GVRRenderData renderData2 = new GVRRenderData(context);
         GVRMaterial mat2 = new GVRMaterial(context, shader.getShaderId());
-        renderData2.setMesh(boundingBox.getMesh());
+        GVRMesh t = boundingBox.getMesh();
+        renderData2.setMesh(t);
         renderData2.setMaterial(mat2);
-        model.attachRenderData(renderData2);
-*/
+        model.attachRenderData(renderData2);*/
+
         // Make Copy of Original Render Data
         saveRenderData();
         model.getTransform().setPosition(0.0f, 200.0f, 980.0f);

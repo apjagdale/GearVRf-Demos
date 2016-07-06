@@ -96,7 +96,7 @@ public class MyMenu extends GVRWidget {
         BitmapFont f = skin.getFont("default-font");
         f.getData().setScale(mFontScale - 1.0f);
 
-        childTable.add(new Label("", skin)).expandX().fillX();
+        //childTable.add(new Label("", skin)).expandX().fillX();
         SelectBoxStyle style = new SelectBoxStyle(f, Color.WHITE,
                 skin.getDrawable("default-select"),
                 skin.get(ScrollPaneStyle.class),
@@ -113,41 +113,7 @@ public class MyMenu extends GVRWidget {
         selectBoxCP.setVisible(true);
         childTable.add(selectBoxCP).height(120.0f * 2 ).width(600.0f);
 
-
-
-        // Button 2
-        childTable.row();
-        childTable.row();
-        //childTable.add(new Label("", skin)).expandX().fillX();
-
-        // Adding Button
-        TextButton button = new TextButton("  Button2  ", skin);
-        button.getLabel().setFontScale(mFontScale);
-        clickMeButton2 = button;
-        clickMeButton2.setName("clickMeButton2Name");
-        button.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y) {
-                System.out.println("click " + x + ", " + y);
-                Log.e("Abhijit", "Got clicked sceond");
-                //clickMeButton2.setChecked(false);
-            }
-        });
-
-        clickMeButton2.setChecked(false);
-        clickMeButton2.setVisible(true);
-        childTable.add(button).height(200).width(450);
-
-
-        // Adding Animation Select Box
-        childTable.row();
-        //BitmapFont f = skin.getFont("default-font");
-        //f.getData().setScale(mFontScale - 1.0f);
-
-       // childTable.add(new Label("", skin)).expandX().fillX();
-        /*SelectBoxStyle style = new SelectBoxStyle(f, Color.WHITE,
-                skin.getDrawable("default-select"),
-                skin.get(ScrollPaneStyle.class),
-                skin.get(ListStyle.class));*/
+        //childTable.row();
 
         final SelectBox selectBox = new SelectBox(style);
         selectBox.setName("SkyBoxType");
@@ -159,6 +125,8 @@ public class MyMenu extends GVRWidget {
 
         selectBox.setVisible(true);
         childTable.add(selectBox).height(120.0f * 2 ).width(600.0f);
+
+        childTable.row();
 
         // Slider for Zoom
         childTable.row();
@@ -190,9 +158,9 @@ public class MyMenu extends GVRWidget {
         mStage.act(Gdx.graphics.getDeltaTime());
        // Log.e("Abhijit", "Render called");
 
-        if(clickMeButton2.isChecked()){
+        /*if(clickMeButton2.isChecked()){
             clickMeButton2.setChecked(false);
-        }
+        }*/
 
         if(flagForSkyBox && mManager.controllerReadyFlag){
             Actor tempActor = mStage.getRoot().findActor("SkyBoxType");

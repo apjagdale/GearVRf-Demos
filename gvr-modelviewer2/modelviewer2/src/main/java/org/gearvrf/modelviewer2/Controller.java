@@ -54,6 +54,7 @@ public class Controller {
 
     // Variables related to Banner
     private Banner oBannerCount;
+    private Banner oBannerLoading;
 
     // Variables related to Custom Shader
     private ArrayList<String> aSCustomShaderList;
@@ -144,18 +145,47 @@ public class Controller {
         }
         room.addChildObject(oBannerCount.getBanner());
     }
+
+    void displayLoadingInRoom(GVRSceneObject room) {
+        if (oBannerLoading == null) {
+            oBannerLoading = new Banner(context, "Loading", 10, Color.BLUE, 0.0f, 200.0f, 995.0f);
+        }
+        room.addChildObject(oBannerLoading.getBanner());
+    }
+
+    void removeLoadingInRoom(GVRSceneObject room) {
+        if (oBannerLoading == null) {
+            return;
+        }
+        room.removeChildObject(oBannerLoading.getBanner());
+    }
     // END Banner Feature
 
 
     // START Camera Position Feature
     private void loadCameraPositionList() {
         oDefaultCameraPosition = new ArrayList<CameraPosition>();
+
+        // User Position Or Front
         oDefaultCameraPosition.add(new CameraPosition(defaultCameraPosition.x, defaultCameraPosition.y, defaultCameraPosition.z));
-        oDefaultCameraPosition.add(new CameraPosition(defaultCameraPosition.x, defaultCameraPosition.y, defaultCameraPosition.z - 150));
-        oDefaultCameraPosition.add(new CameraPosition(defaultCameraPosition.x, defaultCameraPosition.y - 50, defaultCameraPosition.z + 50));
-        oDefaultCameraPosition.add(new CameraPosition(defaultCameraPosition.x, defaultCameraPosition.y + 50, defaultCameraPosition.z));
-        oDefaultCameraPosition.add(new CameraPosition(defaultCameraPosition.x - 30.0f, defaultCameraPosition.y, defaultCameraPosition.z + 50));
-        oDefaultCameraPosition.add(new CameraPosition(defaultCameraPosition.x + 30, defaultCameraPosition.y, defaultCameraPosition.z + 50));
+
+        // With Respect to Model
+        Vector3f defaultModelPosition = new Vector3f(0, 200, 980);
+
+        // Top
+        oDefaultCameraPosition.add(new CameraPosition(defaultModelPosition.x, defaultModelPosition.y + 20, defaultModelPosition.z));
+
+        // Bottom
+        oDefaultCameraPosition.add(new CameraPosition(defaultModelPosition.x, defaultModelPosition.y - 20, defaultModelPosition.z));
+
+        // Back
+        oDefaultCameraPosition.add(new CameraPosition(defaultModelPosition.x, defaultModelPosition.y, defaultModelPosition.z - 20));
+
+        // Left
+        oDefaultCameraPosition.add(new CameraPosition(defaultModelPosition.x - 20, defaultModelPosition.y, defaultModelPosition.z));
+
+        // Right
+        oDefaultCameraPosition.add(new CameraPosition(defaultModelPosition.x + 20, defaultModelPosition.y, defaultModelPosition.z));
     }
 
     public ArrayList<String> getCameraPositionList() {
@@ -283,6 +313,8 @@ public class Controller {
             room.removeChildObject(oneChild);
         }
 
+        currentThumbNailsInRoom.clear();
+
         for (int i = gStart; i < count; ) {
             aModel.get(i).thumbnail.getTransform().setPosition(xPosition, 205.0f, 980.0f);
             xPosition += 6.0;
@@ -337,16 +369,14 @@ public class Controller {
                 if (holder.equals(aModel.get(index).thumbnail.getEyePointeeHolder())) {
                     removeThumbNailsFromCurrentScene(room);
                     Log.d(TAG, "Called Loading Model");
+                    displayLoadingInRoom(room);
                     GVRSceneObject tempModelSO = aModel.get(index).getModel(context);
-                    scene.bindShaders();
 
 
                     Log.d(TAG, "Loading Done");
                     if (tempModelSO != null) {
                         room.addChildObject(tempModelSO);
-
-                        // Custom Shader
-                        //applyCustomShader(tempModelSO);
+                        removeLoadingInRoom(room);
                         Log.d(TAG, "Loading Done");
                         currentDisplayedModel = aModel.get(index);
                         scene.bindShaders();
@@ -460,5 +490,5 @@ public class Controller {
     }
 
     // END SkyBox Features
-    
+
 }

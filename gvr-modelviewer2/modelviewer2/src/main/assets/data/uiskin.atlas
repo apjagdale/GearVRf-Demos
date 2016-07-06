@@ -121,7 +121,7 @@ default-select
   size: 27, 20
   split: 4, 14, 4, 4
   orig: 27, 20
-  offset: 0, 0
+  offset: 5, 0
   index: -1
 default-select-selection
   rotate: false
