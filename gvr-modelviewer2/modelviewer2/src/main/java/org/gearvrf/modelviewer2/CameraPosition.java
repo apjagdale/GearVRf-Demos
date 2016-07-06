@@ -40,9 +40,7 @@ public class CameraPosition {
         sphereObject = new GVRSphereSceneObject(context, false, texture);
         sphereObject.getTransform().setScale(0.5f, 0.5f, 0.5f);
         attachEyePointee(context);
-
         sphereObject.getTransform().setPosition(position.x, position.y, position.z);
-
         return sphereObject;
     }
 

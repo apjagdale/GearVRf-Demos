@@ -59,6 +59,7 @@ public class MyMenu extends GVRWidget {
     int flagIfModelAlreadyLoaded = 0;
     boolean flagForSkyBox = true;
     boolean flagForCustomShader = true;
+    boolean flagForAnimation = true;
 
     public void create(){
         mStage = new Stage();
@@ -126,6 +127,20 @@ public class MyMenu extends GVRWidget {
         selectBox.setVisible(true);
         childTable.add(selectBox).height(120.0f * 2 ).width(600.0f);
 
+        // For Animations
+        final SelectBox selectBoxA = new SelectBox(style);
+        selectBoxA.setName("AnimationType");
+        selectBoxA.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                mManager.setSelectedAnimation(selectBoxA.getSelectedIndex());
+            }
+        });
+
+        selectBoxA.setVisible(true);
+        selectBoxA.setItems("Animation None");
+        childTable.add(selectBoxA).height(120.0f * 2 ).width(600.0f);
+
+
         childTable.row();
 
         // Slider for Zoom
@@ -183,6 +198,30 @@ public class MyMenu extends GVRWidget {
             ((SelectBox) tempActor).setItems(tempList);
             flagForCustomShader = false;
         }
+
+        if(flagForAnimation && mManager.controllerReadyFlag && mManager.isModelPresent()){
+            Actor tempActor = mStage.getRoot().findActor("AnimationType");
+            int count = mManager.getCountOfAnimations();
+            ArrayList<String> list = new ArrayList<String>();
+            list.add("Animation None");
+            for(int i = 0; i < count; i++)
+                list.add("Animation " + Integer.toString(i));
+
+            String tempList[] = new String[list.size()];
+            for(int i = 0; i < list.size(); i++)
+                tempList[i] = list.get(i);
+
+            ((SelectBox) tempActor).setItems(tempList);
+            flagForAnimation = false;
+        }
+
+        if( mManager.controllerReadyFlag && mManager.isModelPresent() == false && flagForAnimation == false){
+            flagForAnimation = true;
+
+            Actor tempActor = mStage.getRoot().findActor("AnimationType");
+            ((SelectBox) tempActor).setItems("Animation None");
+        }
+
         // Enable Slider if Model is loaded
         /*if(flagIfModelAlreadyLoaded == 0 && mManager.getCurrentDisplayedModel() != null){
             Actor aSlider = mStage.getRoot().findActor("Zoom");

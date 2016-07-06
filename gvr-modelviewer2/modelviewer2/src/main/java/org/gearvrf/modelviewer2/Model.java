@@ -28,6 +28,8 @@ import org.gearvrf.GVRMeshEyePointee;
 import org.gearvrf.GVRRenderData;
 import org.gearvrf.GVRSceneObject;
 import org.gearvrf.GVRTexture;
+import org.gearvrf.animation.GVRAnimation;
+import org.gearvrf.scene_objects.GVRModelSceneObject;
 import org.gearvrf.scene_objects.GVRTextViewSceneObject;
 import org.gearvrf.util.AccessibilitySceneShader;
 import org.gearvrf.util.BoundingBoxCreator;
@@ -35,6 +37,7 @@ import org.joml.Vector3f;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Model {
     String name;
@@ -45,8 +48,9 @@ public class Model {
      2. GVRTextViewSceneObject textObject attached*/
     GVRSceneObject thumbnail;
 
-    GVRSceneObject model;
+    GVRModelSceneObject model;
     ArrayList<GVRMaterial> originalMaterial;
+    List<GVRAnimation> animation;
 
 
     private static final String TAG = "Abhijit";
@@ -155,6 +159,14 @@ public class Model {
         // Make Copy of Original Render Data
         saveRenderData();
         model.getTransform().setPosition(0.0f, 200.0f, 980.0f);
+
+        // Load Animations
+        animation = model.getAnimations();
+        Log.e(TAG, "Animation" + Integer.toString(animation.size()));
+    }
+
+    public List<GVRAnimation> getAnimationsList(){
+        return animation;
     }
 
     public GVRSceneObject getModel(GVRContext context) {

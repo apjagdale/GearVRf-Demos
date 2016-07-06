@@ -15,7 +15,9 @@ import org.gearvrf.GVRRenderData;
 import org.gearvrf.GVRRenderPass;
 import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
+import org.gearvrf.GVRTransform;
 import org.gearvrf.animation.GVRAnimation;
+import org.gearvrf.animation.GVRRepeatMode;
 import org.gearvrf.animation.GVRRotationByAxisAnimation;
 import org.gearvrf.scene_objects.GVRModelSceneObject;
 import org.gearvrf.scene_objects.GVRSphereSceneObject;
@@ -28,6 +30,7 @@ import org.joml.Vector3f;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Controller {
     private static final String TAG = "Abhijit";
@@ -48,9 +51,12 @@ public class Controller {
     private final String sEnvironmentPath = Environment.getExternalStorageDirectory().getPath();
     private ArrayList<Model> aModel;
     private Model currentDisplayedModel;
+    public boolean currentModelFlag = false;
     private ArrayList<GVRSceneObject> currentThumbNailsInRoom = new ArrayList<GVRSceneObject>();
+    private GVRAnimation currentAnimation;
     private static final int gSlots = 3;
     private int gStart = 0;
+
 
     // Variables related to Banner
     private Banner oBannerCount;
@@ -215,6 +221,41 @@ public class Controller {
             widget.getTransform().setPosition(position.x - 3.0f, position.y, position.z - 5);
     }
 
+    protected void lookAt(GVRTransform modeltransform, GVRTransform camera, GVRSceneObject mCharacter) {
+        Vector3f cameraV = new Vector3f(camera.getPositionX(), camera.getPositionY(), camera.getPositionZ());
+
+        Vector3f modeltransformV = new Vector3f(modeltransform.getPositionX(), modeltransform.getPositionY(), modeltransform.getPositionZ());
+
+        Vector3f delta = cameraV.sub(modeltransformV);
+        Vector3f direction = delta.normalize();
+
+        Vector3f up;
+
+
+        if (Math.abs(direction.x) < 0.00001
+                && Math.abs(direction.z) < 0.00001) {
+            if (direction.y > 0) {
+                up = new Vector3f(0.0f, 0.0f, -1.0f); // if direction points in +y
+            } else {
+                up = new Vector3f(0.0f, 0.0f, 1.0f); // if direction points in -y
+            }
+        } else {
+            up = new Vector3f(0.0f, 1.0f, 0.0f); // y-axis is the general up
+        }
+
+        up.normalize();
+        Vector3f right = new Vector3f();
+        up.cross(direction, right);
+        right.normalize();
+        direction.cross(right, up);
+        up.normalize();
+
+        float[] matrix = new float[]{right.x, right.y, right.z, 0.0f, up.x, up.y,
+                up.z, 0.0f, direction.x, direction.y, direction.z, 0.0f,
+                modeltransform.getPositionX(), modeltransform.getPositionY(), modeltransform.getPositionZ(), 0.0f};
+        mCharacter.getTransform().setModelMatrix(matrix);
+    }
+
     public void setCameraPositionByNavigator(GVREyePointeeHolder picked, GVRScene scene, GVRSceneObject room, GVRWidgetSceneObject widget) {
         for (int i = 0; i < oDefaultCameraPosition.size(); i++) {
             if (picked.equals(oDefaultCameraPosition.get(i).sphereObject.getEyePointeeHolder())) {
@@ -233,12 +274,39 @@ public class Controller {
                 if (widget != null)
                     widget.getTransform().setPosition(coordinates.x - 3.0f, coordinates.y, coordinates.z - 5);
 
+                for(int j = 0; j < currentThumbNailsInRoom.size(); j++){
+                    lookAt(currentThumbNailsInRoom.get(j).getTransform(), scene.getMainCameraRig().getTransform(), currentThumbNailsInRoom.get(j));
+                }
+                break;
             }
         }
     }
     // END Camera Position Feature
 
     // START Models Features
+
+    public int getCountOfAnimations(){
+        if(currentDisplayedModel != null)
+                return currentDisplayedModel.getAnimationsList().size();
+        return 0;
+    }
+
+    public void setSelectedAnimation(int index){
+        // No Animation
+        if(index == 0){
+            if(currentAnimation != null) {
+                context.getAnimationEngine().stop(currentAnimation);
+                currentAnimation = null;
+            }
+        }
+        else{
+            index -= 1;
+            if(currentDisplayedModel != null && currentDisplayedModel.getAnimationsList().size() > 0)
+                currentAnimation = currentDisplayedModel.getAnimationsList().get(index);
+                currentAnimation.setRepeatMode(GVRRepeatMode.REPEATED).setRepeatCount(-1);
+                context.getAnimationEngine().start(currentAnimation);
+        }
+    }
 
     private ArrayList<String> getListOfModels() {
         ArrayList<String> listOfAllModels = new ArrayList<String>();
@@ -361,8 +429,7 @@ public class Controller {
                 room.addChildObject(thumbnail);
             }
             currentDisplayedModel = null;
-
-
+            currentModelFlag = false;
             return;
         } else {
             for (int index = 0; index < aModel.size(); index++) {
@@ -379,6 +446,7 @@ public class Controller {
                         removeLoadingInRoom(room);
                         Log.d(TAG, "Loading Done");
                         currentDisplayedModel = aModel.get(index);
+                        currentModelFlag = true;
                         scene.bindShaders();
                     } else {
                         //  showMessage("Error Loading Model");
