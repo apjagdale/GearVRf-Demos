@@ -16,87 +16,58 @@
 package org.gearvrf.gvrfbCubic360;
 
 import android.content.res.AssetFileDescriptor;
-import android.graphics.Bitmap;
-import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 
 import org.gearvrf.GVRAndroidResource;
-import org.gearvrf.GVRBitmapTexture;
 import org.gearvrf.GVRContext;
-import org.gearvrf.GVRMaterial;
 import org.gearvrf.GVRScene;
 import org.gearvrf.GVRMain;
 import org.gearvrf.GVRMesh;
-import org.gearvrf.GVRSceneObject;
-import org.gearvrf.utility.Log;
+import org.gearvrf.scene_objects.GVRVideoSceneObject;
 
 import java.io.IOException;
 
-public class fbCubic360ViewManager extends GVRMain implements Runnable {
-
-    private GVRContext mGVRContext = null;
-    private GVRSceneObject mSceneObject = null;
-    MediaMetadataRetriever mediaMetadataRetriever = null;
-    GVRContext gvrContext;
-    GVRMesh cubeMesh;
-    long duration;
-    long start = 0;
-    GVRScene mainScene;
-
-    public void run() {
-        Bitmap bmFrame;
-        GVRBitmapTexture mTexture;
-        GVRMaterial mm;
-
-        try {
-            while (true) {
-                start += 60;
-                start %= duration;
-                Thread.sleep(60);
-                Log.e("Duration", Long.toString(start));
-                bmFrame = mediaMetadataRetriever.getFrameAtTime(start * 1000);
-                mTexture = new GVRBitmapTexture(gvrContext, bmFrame);
-                mm = new GVRMaterial(gvrContext);
-                mm.setMainTexture(mTexture);
-                mSceneObject.getRenderData().setMaterial(mm);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-
+public class fbCubic360ViewManager extends GVRMain
+{
+    /** Called when the activity is first created. */
     @Override
     public void onInit(GVRContext gvrContext) {
-        this.gvrContext = gvrContext;
-        mediaMetadataRetriever = new MediaMetadataRetriever();
 
-        AssetFileDescriptor afd = null;
+        GVRScene scene = gvrContext.getNextMainScene();
+
+        // set up camerarig position (default)
+        scene.getMainCameraRig().getTransform().setPosition( 0.0f, 0.0f, 0.0f );
+
+        // get cube mesh
+        GVRMesh cubeMesh = gvrContext.loadMesh(new GVRAndroidResource(gvrContext, R.raw.video_facebook));
+
+        // create mediaplayer instance
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        AssetFileDescriptor afd;
         try {
-            afd = gvrContext.getActivity().getAssets().openFd("output.mp4");
+            afd = gvrContext.getContext().getAssets().openFd("output.mp4");
+            android.util.Log.d("Minimal360Video", "Assets was found.");
+            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            android.util.Log.d("Minimal360Video", "DataSource was set.");
+            afd.close();
+            mediaPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
+            gvrContext.getActivity().finish();
+            android.util.Log.e("Minimal360Video", "Assets were not loaded. Stopping application!");
         }
 
-        mediaMetadataRetriever.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+        mediaPlayer.setLooping( true );
+        android.util.Log.d("Minimal360Video", "starting player.");
+        mediaPlayer.start();
 
-        String times = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        duration = Integer.parseInt(times);
-        Bitmap bmFrame = mediaMetadataRetriever.getFrameAtTime(start);
+        // create video scene
+        GVRVideoSceneObject video = new GVRVideoSceneObject( gvrContext, cubeMesh, mediaPlayer, GVRVideoSceneObject.GVRVideoType.MONO );
+        video.getTransform().setScale(5, 5, 5 );
+        video.setName( "video" );
 
-        mGVRContext = gvrContext;
-        mainScene = mGVRContext.getNextMainScene();
-        mainScene.getMainCameraRig().getTransform().setPosition(0.0f, 0.0f, 0.0f);
-
-        cubeMesh = mGVRContext.loadMesh(new GVRAndroidResource(mGVRContext, R.raw.video_facebook));
-
-        GVRBitmapTexture mTexture = new GVRBitmapTexture(gvrContext, bmFrame);
-        mSceneObject = new GVRSceneObject(gvrContext, cubeMesh, mTexture);
-
-        mSceneObject.getTransform().setScale(24.5f, 24.5f, 24.5f);
-        mainScene.addSceneObject(mSceneObject);
-
-        Thread t = new Thread(this);
-        t.start();
+        // apply video to scene
+        scene.addSceneObject( video );
     }
 
     @Override
@@ -104,3 +75,4 @@ public class fbCubic360ViewManager extends GVRMain implements Runnable {
     }
 
 }
+

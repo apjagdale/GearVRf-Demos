@@ -17,18 +17,18 @@
 package org.gearvrf.gvrfbCubic360;
 
 import android.os.Bundle;
-
 import org.gearvrf.GVRActivity;
 
 
-public class fbCubic360Activity extends GVRActivity {
-
+public class fbCubic360Activity extends GVRActivity
+{
+    /** Called when the activity is first created. */
     @Override
-    protected void onCreate(Bundle savedInstanceState)
+    public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
         setScript(new fbCubic360ViewManager(), "gvr.xml");
     }
-
 }
+
