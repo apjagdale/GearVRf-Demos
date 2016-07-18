@@ -60,6 +60,7 @@ public class MyMenu extends GVRWidget {
     boolean flagForSkyBox = true;
     boolean flagForCustomShader = true;
     boolean flagForAnimation = true;
+    boolean flagForModels = true;
 
     public void create(){
         mStage = new Stage();
@@ -85,10 +86,6 @@ public class MyMenu extends GVRWidget {
             }
         };
 
-
-
-
-
         childTable.row();
         //childTable.add(new Label("", skin)).expandX().fillX();
 
@@ -102,6 +99,21 @@ public class MyMenu extends GVRWidget {
                 skin.getDrawable("default-select"),
                 skin.get(ScrollPaneStyle.class),
                 skin.get(ListStyle.class));
+
+
+        final SelectBox selectBoxModels = new SelectBox(style);
+        selectBoxModels.setName("ModelsType");
+        selectBoxModels.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                mManager.setSelectedModel(selectBoxModels.getSelectedIndex());
+            }
+        });
+
+        selectBoxModels.setVisible(true);
+        childTable.add(selectBoxModels).height(120.0f * 2 ).width(600.0f);
+
+        childTable.row();
+
 
         final SelectBox selectBoxCP = new SelectBox(style);
         selectBoxCP.setName("CustomShaderType");
@@ -187,6 +199,18 @@ public class MyMenu extends GVRWidget {
             ((SelectBox) tempActor).setItems(tempList);
             flagForSkyBox = false;
         }
+
+        if(flagForModels && mManager.controllerReadyFlag){
+            Actor tempActor = mStage.getRoot().findActor("ModelsType");
+            ArrayList<String> list = mManager.getModelsList();
+            String tempList[] = new String[list.size()];
+            for(int i = 0; i < list.size(); i++)
+                tempList[i] = list.get(i);
+
+            ((SelectBox) tempActor).setItems(tempList);
+            flagForModels = false;
+        }
+
 
         if(flagForCustomShader && mManager.controllerReadyFlag){
             Actor tempActor = mStage.getRoot().findActor("CustomShaderType");
