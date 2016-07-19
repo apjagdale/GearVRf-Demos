@@ -133,7 +133,7 @@ public class Model {
         Vector3f max_corner = bv.maxCorner;
 
            // TODO Scale Approparetly
-        if (radius > 10.0f) {
+        if (radius > 10.0f  || radius < 5.0f ) {
             float scaleFactor = 10 / radius;
             model.getTransform().setScale(scaleFactor, scaleFactor, scaleFactor);
         }

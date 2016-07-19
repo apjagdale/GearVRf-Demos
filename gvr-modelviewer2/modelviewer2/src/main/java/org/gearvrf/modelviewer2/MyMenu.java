@@ -106,6 +106,7 @@ public class MyMenu extends GVRWidget {
         selectBoxModels.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
                 mManager.setSelectedModel(selectBoxModels.getSelectedIndex());
+                flagForAnimation = true;
             }
         });
 
@@ -239,12 +240,12 @@ public class MyMenu extends GVRWidget {
             flagForAnimation = false;
         }
 
-        if( mManager.controllerReadyFlag && mManager.isModelPresent() == false && flagForAnimation == false){
-            flagForAnimation = true;
+      //  if( mManager.controllerReadyFlag && mManager.isModelPresent() == false && flagForAnimation == false){
+      //      flagForAnimation = true;
 
-            Actor tempActor = mStage.getRoot().findActor("AnimationType");
-            ((SelectBox) tempActor).setItems("Animation None");
-        }
+     //       Actor tempActor = mStage.getRoot().findActor("AnimationType");
+     //       ((SelectBox) tempActor).setItems("Animation None");
+     //   }
 
         // Enable Slider if Model is loaded
         /*if(flagIfModelAlreadyLoaded == 0 && mManager.getCurrentDisplayedModel() != null){

@@ -368,8 +368,12 @@ public class Controller {
 
         Log.d(TAG, "Loading Done");
         if (tempModelSO != null) {
-            tempModelSO.getTransform().setPosition(defaultCenterPosition.x, defaultCenterPosition.y, defaultCenterPosition.z);
+            GVRSceneObject.BoundingVolume bv = tempModelSO.getBoundingVolume();
+            tempModelSO.getTransform().setPosition(-bv.center.x, -bv.center.y, -bv.center.z - 1 * bv.radius);
+
+            //tempModelSO.getTransform().setPosition(defaultCenterPosition.x, defaultCenterPosition.y, defaultCenterPosition.z);
             room.addSceneObject(tempModelSO);
+            room.bindShaders();
             removeLoadingInRoom(room);
             Log.d(TAG, "Loading Done");
             currentDisplayedModel = aModel.get(index);
