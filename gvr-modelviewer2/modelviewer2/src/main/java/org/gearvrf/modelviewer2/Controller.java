@@ -177,22 +177,22 @@ public class Controller {
 
         int offset = 20;
         // User Position Or Front
-        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x, defaultCenterPosition.y + 5, defaultCenterPosition.z + offset));
+        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x, defaultCenterPosition.y + 5, defaultCenterPosition.z + offset, 0, 0, 0, 0));
 
         // Top
-        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x, defaultCenterPosition.y + offset, defaultCenterPosition.z));
+        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x, defaultCenterPosition.y + offset, defaultCenterPosition.z, -90, 1, 0, 0));
 
         // Bottom
-        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x, defaultCenterPosition.y - offset, defaultCenterPosition.z));
+        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x, defaultCenterPosition.y - offset, defaultCenterPosition.z, 90, 1, 0, 0));
 
         // Back
-        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x, defaultCenterPosition.y, defaultCenterPosition.z - offset));
+        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x, defaultCenterPosition.y, defaultCenterPosition.z - offset, 180, 0, 1, 0));
 
         // Left
-        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x - offset, defaultCenterPosition.y, defaultCenterPosition.z));
+        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x - offset, defaultCenterPosition.y, defaultCenterPosition.z, -90, 0, 1, 0));
 
         // Right
-        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x + offset, defaultCenterPosition.y, defaultCenterPosition.z));
+        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x + offset, defaultCenterPosition.y, defaultCenterPosition.z, 90, 0, 1, 0));
     }
 
     public ArrayList<String> getCameraPositionList() {
@@ -210,7 +210,7 @@ public class Controller {
         oDefaultCameraPosition.get(0).loadNavigator(context);
 
         for (int i = 1; i < oDefaultCameraPosition.size(); i++) {
-            GVRSphereSceneObject temp = oDefaultCameraPosition.get(i).loadNavigator(context);
+            GVRModelSceneObject temp = oDefaultCameraPosition.get(i).loadNavigator(context);
             room.addSceneObject(temp);
         }
     }
@@ -222,7 +222,7 @@ public class Controller {
             widget.getTransform().setPosition(position.x - 3.0f, position.y, position.z - 5);
     }
 
-    protected void lookAt(GVRTransform modeltransform, GVRTransform camera, GVRSceneObject mCharacter) {
+    protected void lookAt(GVRTransform modeltransform, GVRTransform camera, GVRModelSceneObject mCharacter) {
         Vector3f cameraV = new Vector3f(camera.getPositionX(), camera.getPositionY(), camera.getPositionZ());
 
         Vector3f modeltransformV = new Vector3f(modeltransform.getPositionX(), modeltransform.getPositionY(), modeltransform.getPositionZ());
@@ -259,25 +259,34 @@ public class Controller {
 
     public void setCameraPositionByNavigator(GVREyePointeeHolder picked, GVRScene scene, GVRScene room, GVRWidgetSceneObject widget) {
         for (int i = 0; i < oDefaultCameraPosition.size(); i++) {
-            if (picked.equals(oDefaultCameraPosition.get(i).sphereObject.getEyePointeeHolder())) {
+            if (picked.equals(oDefaultCameraPosition.get(i).cameraModel.getEyePointeeHolder())) {
                 Vector3f coordinates = oDefaultCameraPosition.get(i).getCameraPosition();
                 scene.getMainCameraRig().getTransform().setPosition(coordinates.x, coordinates.y, coordinates.z);
 
+                Vector3f axis = oDefaultCameraPosition.get(i).getRotationAxis();
+                scene.getMainCameraRig().getTransform().setRotationByAxis(oDefaultCameraPosition.get(i).getCameraAngle(), axis.x, axis.y, axis.z);
+
                 if (oCurrentPosition != null) {
                     room.addSceneObject(oCurrentPosition.loadNavigator(context));
+
+                    //oCurrentPosition.loadNavigator(context).removeChildObject(widget);
                 }
 
                 Log.e(TAG, "REmoving navigator " + Integer.toString(i));
-                room.removeSceneObject(oDefaultCameraPosition.get(i).sphereObject);
+                room.removeSceneObject(oDefaultCameraPosition.get(i).cameraModel);
+
+                //oDefaultCameraPosition.get(i).cameraModel.addChildObject(widget);
                 oCurrentPosition = oDefaultCameraPosition.get(i);
 
 
-                if (widget != null)
-                    widget.getTransform().setPosition(coordinates.x - 3.0f, coordinates.y, coordinates.z - 5);
+                //if (widget != null)
+                //    widget.getTransform().setPosition(coordinates.x - 3.0f, coordinates.y, coordinates.z - 5);
 
-                /*for(int j = 0; j < currentThumbNailsInRoom.size(); j++){
-                    lookAt(currentThumbNailsInRoom.get(j).getTransform(), scene.getMainCameraRig().getTransform(), currentThumbNailsInRoom.get(j));
-                }*/
+                for(int j = 0; j < oDefaultCameraPosition.size(); j++){
+                    if(j!=i)
+                    lookAt(oDefaultCameraPosition.get(j).cameraModel.getTransform(), scene.getMainCameraRig().getTransform(), oDefaultCameraPosition.get(j).cameraModel);
+                    //oDefaultCameraPosition.get(j).cameraModel.getTransform().setRotationByAxis(90, 0, 1, 0);
+                }
                 break;
             }
         }
