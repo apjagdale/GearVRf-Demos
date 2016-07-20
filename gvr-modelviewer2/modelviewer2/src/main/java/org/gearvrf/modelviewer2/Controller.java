@@ -27,6 +27,7 @@ import org.gearvrf.util.NoTextureShader;
 import org.gearvrf.util.OutlineShader;
 import org.gearvrf.widgetplugin.GVRWidgetSceneObject;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,6 +65,9 @@ public class Controller {
     // Variables related to Custom Shader
     private ArrayList<String> aSCustomShaderList;
 
+    // Lights
+    private Lights oLight;
+
     private Vector3f defaultCenterPosition;
 
     private GVRActivity activity;
@@ -84,7 +88,98 @@ public class Controller {
         loadModelsList();
         loadCameraPositionList();
         loadCustomShaderList();
+        loadLights();
     }
+
+    // START Lights
+    private void loadLights(){
+        oLight = new Lights();
+        oLight.createLight(context);
+        // Add Ambient
+        oLight.addAmbient(0.3f, 0.0f, 0.0f, 1);
+
+        // Add Diffuse
+        oLight.addDiffuse(0.3f, 0.0f, 0.0f, 1);
+
+        // Add Specular
+        oLight.addSpecular(0.3f, 0.0f, 0.0f, 1);
+
+
+        // Add Ambient
+        oLight.addAmbient(0.0f, 0.0f, 0.5f, 1);
+
+        // Add Diffuse
+        oLight.addDiffuse(0.0f, 0.0f, 0.5f, 1);
+
+        // Add Specular
+        oLight.addSpecular(0.0f, 0.0f, 0.5f, 1);
+
+
+        // Add Ambient
+        oLight.addAmbient(0.0f, 0.3f, 0.0f, 1);
+
+        // Add Diffuse
+        oLight.addDiffuse(0.0f, 0.3f, 0.0f, 1);
+
+        // Add Specular
+        oLight.addSpecular(0.0f, 0.3f, 0.0f, 1);
+    }
+
+    public ArrayList<String> getAmbient() {
+        ArrayList<String> list = new ArrayList<String>();
+        for (Vector4f grbaValue : oLight.getAmbient()) {
+            String sPosition = "R:" + Float.toString(grbaValue.x) + " G:" + Float.toString(grbaValue.y) + " B:" + Float.toString(grbaValue.z) + " A:" + Float.toString(grbaValue.w);
+            list.add(sPosition);
+        }
+        return list;
+    }
+
+    public ArrayList<String> getDiffuse() {
+        ArrayList<String> list = new ArrayList<String>();
+        for (Vector4f grbaValue : oLight.getDiffuse()) {
+            String sPosition = "R:" + Float.toString(grbaValue.x) + " G:" + Float.toString(grbaValue.y) + " B:" + Float.toString(grbaValue.z) + " A:" + Float.toString(grbaValue.w);
+            list.add(sPosition);
+        }
+        return list;
+    }
+
+    public ArrayList<String> getSpecular() {
+        ArrayList<String> list = new ArrayList<String>();
+        for (Vector4f grbaValue : oLight.getSpecular()) {
+            String sPosition = "R:" + Float.toString(grbaValue.x) + " G:" + Float.toString(grbaValue.y) + " B:" + Float.toString(grbaValue.z) + " A:" + Float.toString(grbaValue.w);
+            list.add(sPosition);
+        }
+        return list;
+    }
+
+    public void setAmbient(int index){
+        oLight.setAmbient(index);
+    }
+
+    public void setDiffuse(int index){
+        oLight.setDiffuse(index);
+    }
+
+    public void setSpecular(int index){
+        oLight.setSpecular(index);
+    }
+
+    public void addLight(GVRScene scene){
+        oLight.getLightScene().getTransform().setPosition(0, 10, 0);
+        oLight.getLightScene().getTransform().rotateByAxis(-90, 1, 0, 0);
+        scene.addSceneObject(oLight.getLightScene());
+        scene.bindShaders();
+    }
+
+    public void turnOnOffLight(boolean flag){
+        if(flag)
+            oLight.setSelected(0);
+        else
+            oLight.setDefaultLight();
+    }
+    // END Lights
+
+
 
     // START Custom Shader Feature
     private void loadCustomShaderList() {
@@ -257,16 +352,37 @@ public class Controller {
         mCharacter.getTransform().setModelMatrix(matrix);
     }
 
-    public void setCameraPositionByNavigator(GVREyePointeeHolder picked, GVRScene scene, GVRScene room, GVRWidgetSceneObject widget) {
+    public void setCameraPositionByNavigator(GVREyePointeeHolder picked, GVRScene scene, GVRScene room, GVRWidgetSceneObject widget, float original[]) {
         for (int i = 0; i < oDefaultCameraPosition.size(); i++) {
             if (picked.equals(oDefaultCameraPosition.get(i).cameraModel.getEyePointeeHolder())) {
+
+                // START Code to Attach Menu According to Camera Position
+                scene.removeSceneObject(widget);
+                widget.getTransform().setModelMatrix(original);
+                oDefaultCameraPosition.get(i).cameraModel.addChildObject(widget);
+                Vector3f axis = oDefaultCameraPosition.get(i).getRotationAxis();
+                oDefaultCameraPosition.get(i).cameraModel.getTransform().setRotationByAxis(oDefaultCameraPosition.get(i).getCameraAngle(), axis.x, axis.y, axis.z);
+
+                float temp[] = widget.getTransform().getModelMatrix();
+                widget.getTransform().setModelMatrix(temp);
+                oDefaultCameraPosition.get(i).cameraModel.removeChildObject(widget);
+                scene.addSceneObject(widget);
+
+                // END Code to Attach Menu According to Camera Position
+
                 Vector3f coordinates = oDefaultCameraPosition.get(i).getCameraPosition();
                 scene.getMainCameraRig().getTransform().setPosition(coordinates.x, coordinates.y, coordinates.z);
 
-                Vector3f axis = oDefaultCameraPosition.get(i).getRotationAxis();
+
+
+                 axis = oDefaultCameraPosition.get(i).getRotationAxis();
                 scene.getMainCameraRig().getTransform().setRotationByAxis(oDefaultCameraPosition.get(i).getCameraAngle(), axis.x, axis.y, axis.z);
 
+
+
                 if (oCurrentPosition != null) {
+
+
                     room.addSceneObject(oCurrentPosition.loadNavigator(context));
 
                     //oCurrentPosition.loadNavigator(context).removeChildObject(widget);

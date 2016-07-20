@@ -61,6 +61,8 @@ public class MyMenu extends GVRWidget {
     boolean flagForCustomShader = true;
     boolean flagForAnimation = true;
     boolean flagForModels = true;
+    boolean flagForLights = true;
+    boolean lightOnOff = false;
 
     public void create(){
         mStage = new Stage();
@@ -101,6 +103,10 @@ public class MyMenu extends GVRWidget {
                 skin.get(ListStyle.class));
 
 
+        Label modelLabel = new Label("Models", skin);
+        modelLabel.setFontScale(mFontScale);
+        childTable.add(modelLabel);
+
         final SelectBox selectBoxModels = new SelectBox(style);
         selectBoxModels.setName("ModelsType");
         selectBoxModels.addListener(new ChangeListener() {
@@ -115,7 +121,62 @@ public class MyMenu extends GVRWidget {
 
         childTable.row();
 
+        // Check Box For Lights
+        final CheckBox box = new CheckBox("Lights", skin);
+        box.setChecked(false);
+        box.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                lightOnOff = box.isChecked();
+                    mManager.turnOnOffLight(box.isChecked());
+            }
+        });
+        box.getLabel().setFontScale(mFontScale);
+        box.getCells().get(0).size(80.0f, 80.0f);
+        childTable.add(box);
 
+        // Ambient
+        final SelectBox selectBoxAmbient = new SelectBox(style);
+        selectBoxAmbient.setName("AmbientType");
+        selectBoxAmbient.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                mManager.setAmbient(selectBoxAmbient.getSelectedIndex(), lightOnOff);
+            }
+        });
+
+
+        selectBoxAmbient.setVisible(true);
+        childTable.add(selectBoxAmbient).height(120.0f * 2 ).width(600.0f);
+
+        // Diffuse
+        final SelectBox selectBoxDiffuse = new SelectBox(style);
+        selectBoxDiffuse.setName("DiffuseType");
+        selectBoxDiffuse.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                mManager.setDiffuse(selectBoxDiffuse.getSelectedIndex(), lightOnOff);
+            }
+        });
+
+        selectBoxDiffuse.setVisible(true);
+        childTable.add(selectBoxDiffuse).height(120.0f * 2 ).width(600.0f);
+
+        // Specular
+        final SelectBox selectBoxSpecular = new SelectBox(style);
+        selectBoxSpecular.setName("SpecularType");
+        selectBoxSpecular.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                mManager.setSpecular(selectBoxSpecular.getSelectedIndex(), lightOnOff);
+            }
+        });
+
+        selectBoxSpecular.setVisible(true);
+        childTable.add(selectBoxSpecular).height(120.0f * 2 ).width(600.0f);
+
+
+
+
+
+
+        childTable.row();
         final SelectBox selectBoxCP = new SelectBox(style);
         selectBoxCP.setName("CustomShaderType");
         selectBoxCP.addListener(new ChangeListener() {
@@ -239,6 +300,38 @@ public class MyMenu extends GVRWidget {
             ((SelectBox) tempActor).setItems(tempList);
             flagForAnimation = false;
         }
+
+        if(flagForLights && mManager.controllerReadyFlag){
+            Actor tempActor = mStage.getRoot().findActor("AmbientType");
+            ArrayList<String> list = mManager.getAmbient();
+            String tempList[] = new String[list.size()];
+            for(int i = 0; i < list.size(); i++)
+                tempList[i] = list.get(i);
+
+            ((SelectBox) tempActor).setItems(tempList);
+
+            list.clear();
+            tempActor = mStage.getRoot().findActor("DiffuseType");
+            list = mManager.getDiffuse();
+            tempList = new String[list.size()];
+            for(int i = 0; i < list.size(); i++)
+                tempList[i] = list.get(i);
+
+            ((SelectBox) tempActor).setItems(tempList);
+
+            list.clear();
+            tempActor = mStage.getRoot().findActor("SpecularType");
+            list = mManager.getSpecular();
+            tempList = new String[list.size()];
+            for(int i = 0; i < list.size(); i++)
+                tempList[i] = list.get(i);
+
+            ((SelectBox) tempActor).setItems(tempList);
+
+            flagForLights = false;
+        }
+
+
 
       //  if( mManager.controllerReadyFlag && mManager.isModelPresent() == false && flagForAnimation == false){
       //      flagForAnimation = true;
