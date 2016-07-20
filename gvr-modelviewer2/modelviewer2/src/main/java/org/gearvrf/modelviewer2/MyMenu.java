@@ -16,7 +16,6 @@
 package org.gearvrf.modelviewer2;
 
 
-
 import org.gearvrf.utility.Log;
 import org.gearvrf.widgetplugin.GVRWidget;
 
@@ -52,11 +51,9 @@ public class MyMenu extends GVRWidget {
     private Table mContainer;
     public ModelViewer2Manager mManager;
 
-    Button clickMeButton , clickMeButton2;
-    float mFontScale = 6.0f;
+    float mFontScale = 4.5f;
     Skin skin;
 
-    int flagIfModelAlreadyLoaded = 0;
     boolean flagForSkyBox = true;
     boolean flagForCustomShader = true;
     boolean flagForAnimation = true;
@@ -64,12 +61,10 @@ public class MyMenu extends GVRWidget {
     boolean flagForLights = true;
     boolean lightOnOff = false;
 
-    public void create(){
+    public void create() {
         mStage = new Stage();
         skin = new Skin(Gdx.files.internal("data/uiskin.json"));
         Gdx.input.setInputProcessor(mStage);
-
-
 
         // Parent Table contains all child tables
         mContainer = new Table();
@@ -77,6 +72,7 @@ public class MyMenu extends GVRWidget {
         mContainer.setFillParent(true);
 
         // Add Items Required for Menu and and it to child table
+
         Table childTable = new Table();
         final ScrollPane scroll = new ScrollPane(childTable, skin);
 
@@ -117,17 +113,54 @@ public class MyMenu extends GVRWidget {
         });
 
         selectBoxModels.setVisible(true);
-        childTable.add(selectBoxModels).height(120.0f * 2 ).width(600.0f);
+        childTable.add(selectBoxModels).height(120.0f).width(600.0f);
+
+
+        // For Animations
+        Label animaLabel = new Label("Animations", skin);
+        animaLabel.setFontScale(mFontScale);
+        childTable.add(animaLabel);
+
+        final SelectBox selectBoxA = new SelectBox(style);
+        selectBoxA.setName("AnimationType");
+        selectBoxA.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                mManager.setSelectedAnimation(selectBoxA.getSelectedIndex());
+            }
+        });
+
+        selectBoxA.setVisible(true);
+        selectBoxA.setItems("Animation None");
+        childTable.add(selectBoxA).height(120.0f).width(600.0f);
 
         childTable.row();
 
+
+        // Labels for Light and Parameters
+        Label lightLabel = new Label("Light(On/Off)", skin);
+        lightLabel.setFontScale(mFontScale);
+        childTable.add(lightLabel);
+
+        Label ambientLabel = new Label("Ambient", skin);
+        ambientLabel.setFontScale(mFontScale);
+        childTable.add(ambientLabel);
+
+        Label diffuseLabel = new Label("Diffuse", skin);
+        diffuseLabel.setFontScale(mFontScale);
+        childTable.add(diffuseLabel);
+
+        Label specularLabel = new Label("Specular", skin);
+        specularLabel.setFontScale(mFontScale);
+        childTable.add(specularLabel);
+
+        childTable.row();
         // Check Box For Lights
         final CheckBox box = new CheckBox("Lights", skin);
         box.setChecked(false);
         box.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
                 lightOnOff = box.isChecked();
-                    mManager.turnOnOffLight(box.isChecked());
+                mManager.turnOnOffLight(box.isChecked());
             }
         });
         box.getLabel().setFontScale(mFontScale);
@@ -145,7 +178,7 @@ public class MyMenu extends GVRWidget {
 
 
         selectBoxAmbient.setVisible(true);
-        childTable.add(selectBoxAmbient).height(120.0f * 2 ).width(600.0f);
+        childTable.add(selectBoxAmbient).height(120.0f).width(600.0f);
 
         // Diffuse
         final SelectBox selectBoxDiffuse = new SelectBox(style);
@@ -157,7 +190,7 @@ public class MyMenu extends GVRWidget {
         });
 
         selectBoxDiffuse.setVisible(true);
-        childTable.add(selectBoxDiffuse).height(120.0f * 2 ).width(600.0f);
+        childTable.add(selectBoxDiffuse).height(120.0f).width(600.0f);
 
         // Specular
         final SelectBox selectBoxSpecular = new SelectBox(style);
@@ -169,26 +202,13 @@ public class MyMenu extends GVRWidget {
         });
 
         selectBoxSpecular.setVisible(true);
-        childTable.add(selectBoxSpecular).height(120.0f * 2 ).width(600.0f);
-
-
-
-
+        childTable.add(selectBoxSpecular).height(120.0f).width(600.0f);
 
 
         childTable.row();
-        final SelectBox selectBoxCP = new SelectBox(style);
-        selectBoxCP.setName("CustomShaderType");
-        selectBoxCP.addListener(new ChangeListener() {
-            public void changed(ChangeEvent event, Actor actor) {
-                mManager.setSelectedCustomShader(selectBoxCP.getSelectedIndex());
-            }
-        });
-
-        selectBoxCP.setVisible(true);
-        childTable.add(selectBoxCP).height(120.0f * 2 ).width(600.0f);
-
-        //childTable.row();
+        Label SkyBoxLabel = new Label("SkyBox", skin);
+        SkyBoxLabel.setFontScale(mFontScale);
+        childTable.add(SkyBoxLabel);
 
         final SelectBox selectBox = new SelectBox(style);
         selectBox.setName("SkyBoxType");
@@ -199,21 +219,24 @@ public class MyMenu extends GVRWidget {
         });
 
         selectBox.setVisible(true);
-        childTable.add(selectBox).height(120.0f * 2 ).width(600.0f);
+        childTable.add(selectBox).height(120.0f).width(600.0f);
 
-        // For Animations
-        final SelectBox selectBoxA = new SelectBox(style);
-        selectBoxA.setName("AnimationType");
-        selectBoxA.addListener(new ChangeListener() {
+        childTable.row();
+
+        Label CSLabel = new Label("Custom Shader", skin);
+        CSLabel.setFontScale(mFontScale);
+        childTable.add(CSLabel);
+
+        final SelectBox selectBoxCP = new SelectBox(style);
+        selectBoxCP.setName("CustomShaderType");
+        selectBoxCP.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                mManager.setSelectedAnimation(selectBoxA.getSelectedIndex());
+                mManager.setSelectedCustomShader(selectBoxCP.getSelectedIndex());
             }
         });
 
-        selectBoxA.setVisible(true);
-        selectBoxA.setItems("Animation None");
-        childTable.add(selectBoxA).height(120.0f * 2 ).width(600.0f);
-
+        selectBoxCP.setVisible(true);
+        childTable.add(selectBoxCP).height(120.0f).width(600.0f);
 
         childTable.row();
 
@@ -225,9 +248,9 @@ public class MyMenu extends GVRWidget {
         slider.setVisible(true);
         slider.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                float value = ((Slider)actor).getValue();
-              Log.e("Abhijit", "Value zoom" + ((Slider)actor).getValue());
-                //((Slider) actor).setValue(value);
+                float value = ((Slider) actor).getValue();
+                Log.e("Abhijit", "Value zoom" + ((Slider) actor).getValue());
+
 
                 mManager.zoomCurrentModel(value);
             }
@@ -245,28 +268,23 @@ public class MyMenu extends GVRWidget {
     public void render() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         mStage.act(Gdx.graphics.getDeltaTime());
-       // Log.e("Abhijit", "Render called");
 
-        /*if(clickMeButton2.isChecked()){
-            clickMeButton2.setChecked(false);
-        }*/
-
-        if(flagForSkyBox && mManager.controllerReadyFlag){
+        if (flagForSkyBox && mManager.controllerReadyFlag) {
             Actor tempActor = mStage.getRoot().findActor("SkyBoxType");
             ArrayList<String> list = mManager.getSkyBoxList();
             String tempList[] = new String[list.size()];
-            for(int i = 0; i < list.size(); i++)
+            for (int i = 0; i < list.size(); i++)
                 tempList[i] = list.get(i);
 
             ((SelectBox) tempActor).setItems(tempList);
             flagForSkyBox = false;
         }
 
-        if(flagForModels && mManager.controllerReadyFlag){
+        if (flagForModels && mManager.controllerReadyFlag) {
             Actor tempActor = mStage.getRoot().findActor("ModelsType");
             ArrayList<String> list = mManager.getModelsList();
             String tempList[] = new String[list.size()];
-            for(int i = 0; i < list.size(); i++)
+            for (int i = 0; i < list.size(); i++)
                 tempList[i] = list.get(i);
 
             ((SelectBox) tempActor).setItems(tempList);
@@ -274,38 +292,38 @@ public class MyMenu extends GVRWidget {
         }
 
 
-        if(flagForCustomShader && mManager.controllerReadyFlag){
+        if (flagForCustomShader && mManager.controllerReadyFlag) {
             Actor tempActor = mStage.getRoot().findActor("CustomShaderType");
             ArrayList<String> list = mManager.getListOfCustomShaders();
             String tempList[] = new String[list.size()];
-            for(int i = 0; i < list.size(); i++)
+            for (int i = 0; i < list.size(); i++)
                 tempList[i] = list.get(i);
 
             ((SelectBox) tempActor).setItems(tempList);
             flagForCustomShader = false;
         }
 
-        if(flagForAnimation && mManager.controllerReadyFlag && mManager.isModelPresent()){
+        if (flagForAnimation && mManager.controllerReadyFlag && mManager.isModelPresent()) {
             Actor tempActor = mStage.getRoot().findActor("AnimationType");
             int count = mManager.getCountOfAnimations();
             ArrayList<String> list = new ArrayList<String>();
             list.add("Animation None");
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
                 list.add("Animation " + Integer.toString(i));
 
             String tempList[] = new String[list.size()];
-            for(int i = 0; i < list.size(); i++)
+            for (int i = 0; i < list.size(); i++)
                 tempList[i] = list.get(i);
 
             ((SelectBox) tempActor).setItems(tempList);
             flagForAnimation = false;
         }
 
-        if(flagForLights && mManager.controllerReadyFlag){
+        if (flagForLights && mManager.controllerReadyFlag) {
             Actor tempActor = mStage.getRoot().findActor("AmbientType");
             ArrayList<String> list = mManager.getAmbient();
             String tempList[] = new String[list.size()];
-            for(int i = 0; i < list.size(); i++)
+            for (int i = 0; i < list.size(); i++)
                 tempList[i] = list.get(i);
 
             ((SelectBox) tempActor).setItems(tempList);
@@ -314,7 +332,7 @@ public class MyMenu extends GVRWidget {
             tempActor = mStage.getRoot().findActor("DiffuseType");
             list = mManager.getDiffuse();
             tempList = new String[list.size()];
-            for(int i = 0; i < list.size(); i++)
+            for (int i = 0; i < list.size(); i++)
                 tempList[i] = list.get(i);
 
             ((SelectBox) tempActor).setItems(tempList);
@@ -323,48 +341,13 @@ public class MyMenu extends GVRWidget {
             tempActor = mStage.getRoot().findActor("SpecularType");
             list = mManager.getSpecular();
             tempList = new String[list.size()];
-            for(int i = 0; i < list.size(); i++)
+            for (int i = 0; i < list.size(); i++)
                 tempList[i] = list.get(i);
 
             ((SelectBox) tempActor).setItems(tempList);
 
             flagForLights = false;
         }
-
-
-
-      //  if( mManager.controllerReadyFlag && mManager.isModelPresent() == false && flagForAnimation == false){
-      //      flagForAnimation = true;
-
-     //       Actor tempActor = mStage.getRoot().findActor("AnimationType");
-     //       ((SelectBox) tempActor).setItems("Animation None");
-     //   }
-
-        // Enable Slider if Model is loaded
-        /*if(flagIfModelAlreadyLoaded == 0 && mManager.getCurrentDisplayedModel() != null){
-            Actor aSlider = mStage.getRoot().findActor("Zoom");
-            if(aSlider != null) {
-                ((Slider) aSlider).setVisible(true);
-                ((Slider) aSlider).setValue(0);
-            }
-            flagIfModelAlreadyLoaded = 1;
-        }
-
-        // Disable Slider if Model Not Present
-        if(mManager.getCurrentDisplayedModel() != null){
-            Actor aSlider = mStage.getRoot().findActor("Zoom");
-            if(aSlider != null)
-                ((Slider) aSlider).setVisible(true);
-
-            flagIfModelAlreadyLoaded = 0;
-        }*/
-
-
-
-
-        /*Actor mColorButtonActor = mStage.getRoot().findActor("colorbutton");
-        if(mColorButtonActor != null)
-            ((SelectBox) mColorButtonActor).setItems("Cool", "Hot");*/
 
         mStage.draw();
     }

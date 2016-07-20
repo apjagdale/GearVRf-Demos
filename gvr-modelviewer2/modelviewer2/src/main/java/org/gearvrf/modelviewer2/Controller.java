@@ -9,7 +9,6 @@ import org.gearvrf.GVRActivity;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVREyePointeeHolder;
 import org.gearvrf.GVRMaterial;
-import org.gearvrf.GVRMesh;
 import org.gearvrf.GVRPhongShader;
 import org.gearvrf.GVRRenderData;
 import org.gearvrf.GVRRenderPass;
@@ -31,7 +30,6 @@ import org.joml.Vector4f;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Controller {
     private static final String TAG = "Abhijit";
@@ -53,10 +51,7 @@ public class Controller {
     private ArrayList<Model> aModel;
     private Model currentDisplayedModel;
     public boolean currentModelFlag = false;
-    //private ArrayList<GVRSceneObject> currentThumbNailsInRoom = new ArrayList<GVRSceneObject>();
     private GVRAnimation currentAnimation;
-    private static final int gSlots = 3;
-    private int gStart = 0;
 
     // Variables related to Banner
     private Banner oBannerCount;
@@ -73,9 +68,10 @@ public class Controller {
     private GVRActivity activity;
     private GVRContext context;
 
-    public void setDefaultCenterPosition(Vector3f defaultPosition){
+    public void setDefaultCenterPosition(Vector3f defaultPosition) {
         defaultCenterPosition = new Vector3f(defaultPosition);
     }
+
     public Controller(GVRActivity activity, GVRContext context) {
         this.activity = activity;
         this.context = context;
@@ -92,7 +88,7 @@ public class Controller {
     }
 
     // START Lights
-    private void loadLights(){
+    private void loadLights() {
         oLight = new Lights();
         oLight.createLight(context);
         // Add Ambient
@@ -103,7 +99,6 @@ public class Controller {
 
         // Add Specular
         oLight.addSpecular(0.3f, 0.0f, 0.0f, 1);
-
 
         // Add Ambient
         oLight.addAmbient(0.0f, 0.0f, 0.5f, 1);
@@ -152,33 +147,32 @@ public class Controller {
         return list;
     }
 
-    public void setAmbient(int index){
+    public void setAmbient(int index) {
         oLight.setAmbient(index);
     }
 
-    public void setDiffuse(int index){
+    public void setDiffuse(int index) {
         oLight.setDiffuse(index);
     }
 
-    public void setSpecular(int index){
+    public void setSpecular(int index) {
         oLight.setSpecular(index);
     }
 
-    public void addLight(GVRScene scene){
+    public void addLight(GVRScene scene) {
         oLight.getLightScene().getTransform().setPosition(0, 10, 0);
         oLight.getLightScene().getTransform().rotateByAxis(-90, 1, 0, 0);
         scene.addSceneObject(oLight.getLightScene());
         scene.bindShaders();
     }
 
-    public void turnOnOffLight(boolean flag){
-        if(flag)
+    public void turnOnOffLight(boolean flag) {
+        if (flag)
             oLight.setSelected(0);
         else
             oLight.setDefaultLight();
     }
     // END Lights
-
 
 
     // START Custom Shader Feature
@@ -194,9 +188,9 @@ public class Controller {
         return aSCustomShaderList;
     }
 
-  //  ArrayList<GVRMaterial> temp;
+    //  ArrayList<GVRMaterial> temp;
     public void applyCustomShader(int index, GVRScene scene) {
-        if(currentDisplayedModel == null)
+        if (currentDisplayedModel == null)
             return;
         ArrayList<GVRRenderData> renderDatas = currentDisplayedModel.getModel(context).getAllComponents(GVRRenderData.getComponentType());
         GVRMaterial outlineMaterial = new GVRMaterial(context);
@@ -220,9 +214,7 @@ public class Controller {
             case 2:
                 outlineMaterial.setVec4(OutlineShader.COLOR_KEY, 0.4f, 0.1725f, 0.1725f, 1.0f);
                 outlineMaterial.setFloat(OutlineShader.THICKNESS_KEY, 2.0f);
-                //temp = new ArrayList<GVRMaterial>();
                 for (GVRRenderData rdata : renderDatas) {
-                    //temp.add(rdata.getMaterial());
                     rdata.setMaterial(outlineMaterial);
                     rdata.setShaderTemplate(OutlineShader.class);
                     rdata.setCullFace(GVRRenderPass.GVRCullFaceEnum.Front);
@@ -310,13 +302,6 @@ public class Controller {
         }
     }
 
-    public void setCameraPosition(GVRScene scene, GVRWidgetSceneObject widget, int index) {
-        Vector3f position = oDefaultCameraPosition.get(index).getCameraPosition();
-        scene.getMainCameraRig().getTransform().setPosition(position.x, position.y, position.z);
-        if (widget != null)
-            widget.getTransform().setPosition(position.x - 3.0f, position.y, position.z - 5);
-    }
-
     protected void lookAt(GVRTransform modeltransform, GVRTransform camera, GVRModelSceneObject mCharacter) {
         Vector3f cameraV = new Vector3f(camera.getPositionX(), camera.getPositionY(), camera.getPositionZ());
 
@@ -373,35 +358,20 @@ public class Controller {
                 Vector3f coordinates = oDefaultCameraPosition.get(i).getCameraPosition();
                 scene.getMainCameraRig().getTransform().setPosition(coordinates.x, coordinates.y, coordinates.z);
 
-
-
-                 axis = oDefaultCameraPosition.get(i).getRotationAxis();
+                axis = oDefaultCameraPosition.get(i).getRotationAxis();
                 scene.getMainCameraRig().getTransform().setRotationByAxis(oDefaultCameraPosition.get(i).getCameraAngle(), axis.x, axis.y, axis.z);
 
-
-
                 if (oCurrentPosition != null) {
-
-
                     room.addSceneObject(oCurrentPosition.loadNavigator(context));
-
-                    //oCurrentPosition.loadNavigator(context).removeChildObject(widget);
                 }
 
                 Log.e(TAG, "REmoving navigator " + Integer.toString(i));
                 room.removeSceneObject(oDefaultCameraPosition.get(i).cameraModel);
-
-                //oDefaultCameraPosition.get(i).cameraModel.addChildObject(widget);
                 oCurrentPosition = oDefaultCameraPosition.get(i);
 
-
-                //if (widget != null)
-                //    widget.getTransform().setPosition(coordinates.x - 3.0f, coordinates.y, coordinates.z - 5);
-
-                for(int j = 0; j < oDefaultCameraPosition.size(); j++){
-                    if(j!=i)
-                    lookAt(oDefaultCameraPosition.get(j).cameraModel.getTransform(), scene.getMainCameraRig().getTransform(), oDefaultCameraPosition.get(j).cameraModel);
-                    //oDefaultCameraPosition.get(j).cameraModel.getTransform().setRotationByAxis(90, 0, 1, 0);
+                for (int j = 0; j < oDefaultCameraPosition.size(); j++) {
+                    if (j != i)
+                        lookAt(oDefaultCameraPosition.get(j).cameraModel.getTransform(), scene.getMainCameraRig().getTransform(), oDefaultCameraPosition.get(j).cameraModel);
                 }
                 break;
             }
@@ -411,26 +381,25 @@ public class Controller {
 
     // START Models Features
 
-    public int getCountOfAnimations(){
-        if(currentDisplayedModel != null)
-                return currentDisplayedModel.getAnimationsList().size();
+    public int getCountOfAnimations() {
+        if (currentDisplayedModel != null)
+            return currentDisplayedModel.getAnimationsList().size();
         return 0;
     }
 
-    public void setSelectedAnimation(int index){
+    public void setSelectedAnimation(int index) {
         // No Animation
-        if(index == 0){
-            if(currentAnimation != null) {
+        if (index == 0) {
+            if (currentAnimation != null) {
                 context.getAnimationEngine().stop(currentAnimation);
                 currentAnimation = null;
             }
-        }
-        else{
+        } else {
             index -= 1;
-            if(currentDisplayedModel != null && currentDisplayedModel.getAnimationsList().size() > 0)
+            if (currentDisplayedModel != null && currentDisplayedModel.getAnimationsList().size() > 0)
                 currentAnimation = currentDisplayedModel.getAnimationsList().get(index);
-                currentAnimation.setRepeatMode(GVRRepeatMode.REPEATED).setRepeatCount(-1);
-                context.getAnimationEngine().start(currentAnimation);
+            currentAnimation.setRepeatMode(GVRRepeatMode.REPEATED).setRepeatCount(-1);
+            context.getAnimationEngine().start(currentAnimation);
         }
     }
 
@@ -460,11 +429,6 @@ public class Controller {
         return listOfAllModels;
     }
 
-    /* Get List of Model and do the following
-            1. Create its thumbNail and text
-            2. Add Eye Pointee for thumbnail
-    */
-
     void loadModelsList() {
         aModel = new ArrayList<Model>();
         ArrayList<String> listOfAllModels = getListOfModels();
@@ -474,17 +438,17 @@ public class Controller {
         }
     }
 
-    ArrayList<String> getModelsList(){
+    ArrayList<String> getModelsList() {
         ArrayList<String> listOfModels = new ArrayList<String>();
 
-        for(Model m : aModel)
+        for (Model m : aModel)
             listOfModels.add(m.getModelName());
 
         return listOfModels;
     }
 
-    void setModelWithIndex(int index, GVRScene room){
-        if(currentDisplayedModel != null){
+    void setModelWithIndex(int index, GVRScene room) {
+        if (currentDisplayedModel != null) {
             room.removeSceneObject(currentDisplayedModel.getModel(context));
         }
 
@@ -495,8 +459,6 @@ public class Controller {
         if (tempModelSO != null) {
             GVRSceneObject.BoundingVolume bv = tempModelSO.getBoundingVolume();
             tempModelSO.getTransform().setPosition(-bv.center.x, -bv.center.y, -bv.center.z - 1 * bv.radius);
-
-            //tempModelSO.getTransform().setPosition(defaultCenterPosition.x, defaultCenterPosition.y, defaultCenterPosition.z);
             room.addSceneObject(tempModelSO);
             room.bindShaders();
             removeLoadingInRoom(room);
@@ -508,139 +470,6 @@ public class Controller {
         removeLoadingInRoom(room);
 
     }
-
-    /*void addThumbNails(GVRSceneObject room) {
-        Log.d(TAG, "Adding all thumbnails to the Room");
-        int lSlots = gSlots;
-
-        int count = aModel.size();
-        float xPosition = -2.0f;
-
-        ArrayList<GVRAnimation> aAnimation = new ArrayList<GVRAnimation>();
-        GVRAnimation animation;
-
-        for (int i = 0; i < currentThumbNailsInRoom.size(); i++) {
-            animation = new GVRRotationByAxisAnimation(currentThumbNailsInRoom.get(i), 2, 360, 0, 1, 0).start(context.getAnimationEngine());
-            //animation.setRepeatMode(1);
-            animation.setRepeatCount(-1);
-            aAnimation.add(animation);
-        }
-
-        for (int i = 0; i < currentThumbNailsInRoom.size(); i++) {
-            while (!aAnimation.get(i).isFinished()) {
-            }
-        }
-
-        for (int i = 0; i < currentThumbNailsInRoom.size(); i++) {
-            context.getAnimationEngine().stop(aAnimation.get(i));
-        }
-
-        aAnimation.clear();
-
-        for (GVRSceneObject oneChild : currentThumbNailsInRoom) {
-            room.removeChildObject(oneChild);
-        }
-
-        currentThumbNailsInRoom.clear();
-
-        for (int i = gStart; i < count; ) {
-            aModel.get(i).thumbnail.getTransform().setPosition(xPosition, 205.0f, 980.0f);
-            xPosition += 6.0;
-
-            room.addChildObject(aModel.get(i).thumbnail);
-            currentThumbNailsInRoom.add(aModel.get(i).thumbnail);
-
-            lSlots--;
-
-            i = (i + 1) % count;
-            gStart = i;
-
-            if (lSlots == 0) {
-                break;
-            }
-
-        }
-    }*/
-
-    /*void removeThumbNailsFromCurrentScene(GVRSceneObject room) {
-        for (GVRSceneObject thumbNail : currentThumbNailsInRoom) {
-            room.removeChildObject(thumbNail);
-        }
-    }*/
-
-   /* void displayModelIfSelected(GVREyePointeeHolder holder, GVRScene scene, GVRSceneObject room, GVRWidgetSceneObject widget) {
-
-
-        // Remove Old Model If any
-        // If Tapped On Current Model Close It
-        if (currentDisplayedModel != null && holder.equals(currentDisplayedModel.model.getEyePointeeHolder())) {
-            room.removeChildObject(currentDisplayedModel.getModel(context));
-
-            // Set Camera Position to Default
-            // Reset Camera Position to Default
-            // Remove Sphere of Default Camera View
-            scene.getMainCameraRig().getTransform().setPosition(defaultCameraPosition.x, defaultCameraPosition.y, defaultCameraPosition.z);
-            //widget.getTransform().setPosition(defaultCameraPosition.x - 3.0f, defaultCameraPosition.y, defaultCameraPosition.z - 5);
-            setCameraPositionByNavigator(oDefaultCameraPosition.get(0).sphereObject.getEyePointeeHolder(), scene, room, widget);
-
-            Log.e(TAG, "TApped on Model so displaying THumbNail");
-            // Add ThumbNails already present before
-            //for (GVRSceneObject thumbnail : currentThumbNailsInRoom) {
-             //   room.addChildObject(thumbnail);
-            //}
-            currentDisplayedModel = null;
-            currentModelFlag = false;
-            return;
-        } else {
-            for (int index = 0; index < aModel.size(); index++) {
-                if (holder.equals(aModel.get(index).thumbnail.getEyePointeeHolder())) {
-                    removeThumbNailsFromCurrentScene(room);
-                    Log.d(TAG, "Called Loading Model");
-                    displayLoadingInRoom(room);
-                    GVRSceneObject tempModelSO = aModel.get(index).getModel(context);
-
-
-                    Log.d(TAG, "Loading Done");
-                    if (tempModelSO != null) {
-                        room.addChildObject(tempModelSO);
-                        removeLoadingInRoom(room);
-                        Log.d(TAG, "Loading Done");
-                        currentDisplayedModel = aModel.get(index);
-                        currentModelFlag = true;
-                        scene.bindShaders();
-                    } else {
-                        Log.d(TAG, "Error Loading Model");
-                        displayLoadingInRoom(room);
-
-                        // Add ThumbNails already present before
-                        for (GVRSceneObject thumbnail : currentThumbNailsInRoom) {
-                            room.addChildObject(thumbnail);
-                        }
-                        currentDisplayedModel = null;
-                        currentModelFlag = false;
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        removeLoadingInRoom(room);
-                        //  showMessage("Error Loading Model");
-                    }
-                    break;
-                }
-            }
-        }
-    }*/
-
-
-    /*void onFowardSwipeOfThumbNails(GVREyePointeeHolder holder, GVRSceneObject room) {
-        for (int i = 0; i < currentThumbNailsInRoom.size(); i++) {
-            if (holder == currentThumbNailsInRoom.get(i).getEyePointeeHolder()) {
-                addThumbNails(room);
-                return;
-            }
-        }
-    }*/
 
     void onScrollOverModel(GVREyePointeeHolder holder, float scrollValue) {
         GVRAnimation animation = null;

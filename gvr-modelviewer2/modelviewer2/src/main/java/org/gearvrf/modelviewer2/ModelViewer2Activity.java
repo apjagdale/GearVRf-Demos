@@ -39,8 +39,6 @@ public class ModelViewer2Activity extends GVRActivity implements
     private GVRWidgetPlugin mPlugin= new GVRWidgetPlugin(this);
     private VRTouchPadGestureDetector mDetector = null;
     private ModelViewer2Manager mManager = null;
-    private GVRFrameLayout frameLayout;
-    private Button button1, button2;
     MyMenu mWidget;
 
 
