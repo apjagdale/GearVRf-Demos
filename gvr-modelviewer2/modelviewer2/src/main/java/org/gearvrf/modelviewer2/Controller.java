@@ -262,7 +262,7 @@ public class Controller {
     private void loadCameraPositionList() {
         oDefaultCameraPosition = new ArrayList<CameraPosition>();
 
-        int offset = 20;
+        int offset = 15;
         // User Position Or Front
         oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x, defaultCenterPosition.y + 5, defaultCenterPosition.z + offset, 0, 0, 0, 0));
 
@@ -458,13 +458,16 @@ public class Controller {
         Log.d(TAG, "Loading Done");
         if (tempModelSO != null) {
             GVRSceneObject.BoundingVolume bv = tempModelSO.getBoundingVolume();
-            tempModelSO.getTransform().setPosition(-bv.center.x, -bv.center.y, -bv.center.z - 1 * bv.radius);
+            //tempModelSO.getTransform().setPosition(-bv.center.x, -bv.center.y, -bv.center.z * bv.radius);
+            tempModelSO.getTransform().setPosition(0,0,0);
             room.addSceneObject(tempModelSO);
             room.bindShaders();
             removeLoadingInRoom(room);
             Log.d(TAG, "Loading Done");
             currentDisplayedModel = aModel.get(index);
             currentModelFlag = true;
+        }else{
+            Log.d(TAG, "Loading Error");
         }
 
         removeLoadingInRoom(room);
@@ -492,7 +495,7 @@ public class Controller {
         Log.e(TAG, "Zoom by" + Float.toString(zTransform));
 
         if (currentDisplayedModel != null)
-            currentDisplayedModel.getModel(context).getTransform().setPositionZ(defaultCenterPosition.z + zTransform);
+            currentDisplayedModel.getModel(context).getTransform().setPositionZ(/*defaultCenterPosition.z + */zTransform - 5.0f);
     }
     // END Models Features
 
