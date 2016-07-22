@@ -62,6 +62,7 @@ public class Controller {
 
     // Lights
     private Lights oLight;
+    private boolean oLightFlag = false;
 
     private Vector3f defaultCenterPosition;
 
@@ -166,11 +167,39 @@ public class Controller {
         scene.bindShaders();
     }
 
+    public void enableDisableLightOnModel(GVRSceneObject model, boolean flag){
+        ArrayList<GVRRenderData> rdata = model.getAllComponents(GVRRenderData.getComponentType());
+        for (GVRRenderData r : rdata) {
+
+            if(r != null){
+                if(flag){
+                    r.enableLight();
+                }
+                else{
+                    r.disableLight();
+                }
+
+            }
+        }
+    }
+
     public void turnOnOffLight(boolean flag) {
-        if (flag)
+        if (flag) {
             oLight.setSelected(0);
-        else
+            oLightFlag = true;
+
+            if(currentDisplayedModel != null) {
+                enableDisableLightOnModel(currentDisplayedModel.getModel(context), true);
+            }
+        }
+        else{
             oLight.setDefaultLight();
+            oLightFlag = false;
+
+            if(currentDisplayedModel != null) {
+                enableDisableLightOnModel(currentDisplayedModel.getModel(context), false);
+            }
+        }
     }
     // END Lights
 
@@ -460,6 +489,7 @@ public class Controller {
             GVRSceneObject.BoundingVolume bv = tempModelSO.getBoundingVolume();
             //tempModelSO.getTransform().setPosition(-bv.center.x, -bv.center.y, -bv.center.z * bv.radius);
             tempModelSO.getTransform().setPosition(0, 0, 0);
+            enableDisableLightOnModel(tempModelSO, oLightFlag);
             room.addSceneObject(tempModelSO);
             room.bindShaders();
             removeLoadingInRoom(room);
@@ -469,9 +499,7 @@ public class Controller {
         } else {
             Log.d(TAG, "Loading Error");
         }
-
         removeLoadingInRoom(room);
-
     }
 
     void onScrollOverModel(GVREyePointeeHolder holder, float scrollValue) {
