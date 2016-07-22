@@ -190,7 +190,7 @@ public class Controller {
                 enableDisableLightOnModel(currentDisplayedModel.getModel(context), true);
             }
         } else {
-            oLight.setDefaultLight();
+            //oLight.setDefaultLight();
             oLightFlag = false;
 
             if (currentDisplayedModel != null) {
@@ -229,6 +229,8 @@ public class Controller {
                     renderDatas.get(i).setShaderTemplate(GVRPhongShader.class);
                     renderDatas.get(i).setCullFace(GVRRenderPass.GVRCullFaceEnum.Back);
                     renderDatas.get(i).setDrawMode(4);
+                    scene.bindShaders();
+                    enableDisableLightOnModel(currentDisplayedModel.getModel(context), false);
                 }
                 break;
             case 1:
