@@ -51,6 +51,8 @@ public class Model {
     GVRModelSceneObject model;
     ArrayList<GVRMaterial> originalMaterial;
     List<GVRAnimation> animation;
+    private float originalZoom;
+    private float currentZoom = 0;
 
 
     private static final String TAG = "Abhijit";
@@ -92,17 +94,20 @@ public class Model {
         // Adding Pointee to Model
         /*GVRSceneObject.BoundingVolume*/
         bv = model.getBoundingVolume();
-        Float radius = bv.radius;
-        Log.e(TAG, "Radius" + Float.toString(radius));
+        float originalRadius = bv.radius;
+        Log.e(TAG, "Radius" + Float.toString(originalRadius));
         Vector3f min_corner = bv.minCorner;
         Vector3f max_corner = bv.maxCorner;
 
         // TODO Scale Approparetly
-        if (radius > 7.0f || radius < 5.0f) {
-            float scaleFactor = 7 / radius;
+        if (originalRadius > 7.0f || originalRadius < 5.0f) {
+            float scaleFactor = 7 / originalRadius;
             model.getTransform().setScale(scaleFactor, scaleFactor, scaleFactor);
+            bv = model.getBoundingVolume();
+            originalRadius = bv.radius;
         }
 
+        //currentRadius = originalRadius;
 
         //After setting position
  /*       bv = model.getBoundingVolume();
@@ -145,5 +150,13 @@ public class Model {
             loadModel(context);
         }
         return model;
+    }
+
+    public float getCurrentZoom() {
+        return currentZoom;
+    }
+
+    public void setCurrentZoom(float zoom) {
+        currentZoom = zoom;
     }
 }

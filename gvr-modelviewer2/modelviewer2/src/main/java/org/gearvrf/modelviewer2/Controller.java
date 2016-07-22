@@ -273,13 +273,13 @@ public class Controller {
         oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x, defaultCenterPosition.y - offset, defaultCenterPosition.z, 90, 1, 0, 0));
 
         // Back
-        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x, defaultCenterPosition.y, defaultCenterPosition.z - offset, 180, 0, 1, 0));
+        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x, defaultCenterPosition.y + 5, defaultCenterPosition.z - offset, 180, 0, 1, 0));
 
         // Left
-        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x - offset, defaultCenterPosition.y, defaultCenterPosition.z, -90, 0, 1, 0));
+        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x - offset, defaultCenterPosition.y + 5, defaultCenterPosition.z, -90, 0, 1, 0));
 
         // Right
-        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x + offset, defaultCenterPosition.y, defaultCenterPosition.z, 90, 0, 1, 0));
+        oDefaultCameraPosition.add(new CameraPosition(defaultCenterPosition.x + offset, defaultCenterPosition.y + 5, defaultCenterPosition.z, 90, 0, 1, 0));
     }
 
     public ArrayList<String> getCameraPositionList() {
@@ -459,14 +459,14 @@ public class Controller {
         if (tempModelSO != null) {
             GVRSceneObject.BoundingVolume bv = tempModelSO.getBoundingVolume();
             //tempModelSO.getTransform().setPosition(-bv.center.x, -bv.center.y, -bv.center.z * bv.radius);
-            tempModelSO.getTransform().setPosition(0,0,0);
+            tempModelSO.getTransform().setPosition(0, 0, 0);
             room.addSceneObject(tempModelSO);
             room.bindShaders();
             removeLoadingInRoom(room);
             Log.d(TAG, "Loading Done");
             currentDisplayedModel = aModel.get(index);
             currentModelFlag = true;
-        }else{
+        } else {
             Log.d(TAG, "Loading Error");
         }
 
@@ -490,12 +490,31 @@ public class Controller {
     }
 
     void onZoomOverModel(float zoomBy) {
-        // User is at 1000 and Object is at 980
-        float zTransform = (10) / (100.0f - zoomBy);
-        Log.e(TAG, "Zoom by" + Float.toString(zTransform));
-
-        if (currentDisplayedModel != null)
-            currentDisplayedModel.getModel(context).getTransform().setPositionZ(/*defaultCenterPosition.z + */zTransform - 5.0f);
+        float zTransform = (int) ((zoomBy) / (10));
+        Log.e(TAG, "Zoom by" + Float.toString(zTransform) + "  " + Float.toString(zoomBy));
+        if (currentDisplayedModel != null) {
+            float units = currentDisplayedModel.getCurrentZoom();
+            if (units < zTransform) {
+                float scaleFactor = zTransform - units;
+                float sf = 1.1f;
+                for (int i = 0; i < scaleFactor; i++) {
+                    float x = currentDisplayedModel.getModel(context).getTransform().getScaleX();
+                    float y = currentDisplayedModel.getModel(context).getTransform().getScaleY();
+                    float z = currentDisplayedModel.getModel(context).getTransform().getScaleZ();
+                    currentDisplayedModel.getModel(context).getTransform().setScale(sf * x, sf * y, sf * z);
+                }
+            } else {
+                float scaleFactor = units - zTransform;
+                float sf = 0.9f;
+                for (int i = 0; i < scaleFactor; i++) {
+                    float x = currentDisplayedModel.getModel(context).getTransform().getScaleX();
+                    float y = currentDisplayedModel.getModel(context).getTransform().getScaleY();
+                    float z = currentDisplayedModel.getModel(context).getTransform().getScaleZ();
+                    currentDisplayedModel.getModel(context).getTransform().setScale(sf * x, sf * y, sf * z);
+                }
+            }
+            currentDisplayedModel.setCurrentZoom(zTransform);
+        }
     }
     // END Models Features
 
