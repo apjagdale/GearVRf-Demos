@@ -36,16 +36,14 @@ import java.util.ArrayList;
 public class ModelViewer2Activity extends GVRActivity implements
         OnTouchPadGestureListener {
 
-    private GVRWidgetPlugin mPlugin= new GVRWidgetPlugin(this);
+    private GVRWidgetPlugin mPlugin = new GVRWidgetPlugin(this);
     private VRTouchPadGestureDetector mDetector = null;
     private ModelViewer2Manager mManager = null;
     MyMenu mWidget;
 
-
-
-	@Override
-	protected void onCreate(Bundle icicle) {
-		super.onCreate(icicle);
+    @Override
+    protected void onCreate(Bundle icicle) {
+        super.onCreate(icicle);
 
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -60,9 +58,7 @@ public class ModelViewer2Activity extends GVRActivity implements
         mPlugin.setCurrentScript(mManager);
         mWidget.mManager = mManager;
 
-
         setScript(mManager, "gvr.xml");
-
     }
 
     @Override

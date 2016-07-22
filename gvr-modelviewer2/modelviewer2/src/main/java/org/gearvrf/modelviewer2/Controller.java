@@ -32,7 +32,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class Controller {
-    private static final String TAG = "Abhijit";
+    private static final String TAG = "GVRModelViewer2";
 
     // Variables related to SkyBox
     private ArrayList<SkyBox> aODefaultSkyBox;
@@ -93,32 +93,32 @@ public class Controller {
         oLight = new Lights();
         oLight.createLight(context);
         // Add Ambient
-        oLight.addAmbient(0.3f, 0.0f, 0.0f, 1);
+        oLight.addAmbient(0.3f, 0.0f, 0.0f, 0.5f);
 
         // Add Diffuse
-        oLight.addDiffuse(0.3f, 0.0f, 0.0f, 1);
+        oLight.addDiffuse(0.3f, 0.0f, 0.0f, 0.5f);
 
         // Add Specular
-        oLight.addSpecular(0.3f, 0.0f, 0.0f, 1);
+        oLight.addSpecular(0.3f, 0.0f, 0.0f, 0.5f);
 
         // Add Ambient
-        oLight.addAmbient(0.0f, 0.0f, 0.5f, 1);
+        oLight.addAmbient(0.0f, 0.0f, 0.5f, 0.5f);
 
         // Add Diffuse
-        oLight.addDiffuse(0.0f, 0.0f, 0.5f, 1);
+        oLight.addDiffuse(0.0f, 0.0f, 0.5f, 0.5f);
 
         // Add Specular
-        oLight.addSpecular(0.0f, 0.0f, 0.5f, 1);
+        oLight.addSpecular(0.0f, 0.0f, 0.5f, 0.5f);
 
 
         // Add Ambient
-        oLight.addAmbient(0.0f, 0.3f, 0.0f, 1);
+        oLight.addAmbient(0.0f, 0.3f, 0.0f, 0.5f);
 
         // Add Diffuse
-        oLight.addDiffuse(0.0f, 0.3f, 0.0f, 1);
+        oLight.addDiffuse(0.0f, 0.3f, 0.0f, 0.5f);
 
         // Add Specular
-        oLight.addSpecular(0.0f, 0.3f, 0.0f, 1);
+        oLight.addSpecular(0.0f, 0.3f, 0.0f, 0.5f);
     }
 
     public ArrayList<String> getAmbient() {
@@ -167,15 +167,14 @@ public class Controller {
         scene.bindShaders();
     }
 
-    public void enableDisableLightOnModel(GVRSceneObject model, boolean flag){
+    public void enableDisableLightOnModel(GVRSceneObject model, boolean flag) {
         ArrayList<GVRRenderData> rdata = model.getAllComponents(GVRRenderData.getComponentType());
         for (GVRRenderData r : rdata) {
 
-            if(r != null){
-                if(flag){
+            if (r != null) {
+                if (flag) {
                     r.enableLight();
-                }
-                else{
+                } else {
                     r.disableLight();
                 }
 
@@ -188,15 +187,14 @@ public class Controller {
             oLight.setSelected(0);
             oLightFlag = true;
 
-            if(currentDisplayedModel != null) {
+            if (currentDisplayedModel != null) {
                 enableDisableLightOnModel(currentDisplayedModel.getModel(context), true);
             }
-        }
-        else{
+        } else {
             oLight.setDefaultLight();
             oLightFlag = false;
 
-            if(currentDisplayedModel != null) {
+            if (currentDisplayedModel != null) {
                 enableDisableLightOnModel(currentDisplayedModel.getModel(context), false);
             }
         }
@@ -217,7 +215,6 @@ public class Controller {
         return aSCustomShaderList;
     }
 
-    //  ArrayList<GVRMaterial> temp;
     public void applyCustomShader(int index, GVRScene scene) {
         if (currentDisplayedModel == null)
             return;
@@ -394,7 +391,7 @@ public class Controller {
                     room.addSceneObject(oCurrentPosition.loadNavigator(context));
                 }
 
-                Log.e(TAG, "REmoving navigator " + Integer.toString(i));
+                Log.e(TAG, "Removing navigator " + Integer.toString(i));
                 room.removeSceneObject(oDefaultCameraPosition.get(i).cameraModel);
                 oCurrentPosition = oDefaultCameraPosition.get(i);
 
@@ -486,12 +483,11 @@ public class Controller {
 
         Log.d(TAG, "Loading Done");
         if (tempModelSO != null) {
-            GVRSceneObject.BoundingVolume bv = tempModelSO.getBoundingVolume();
-            //tempModelSO.getTransform().setPosition(-bv.center.x, -bv.center.y, -bv.center.z * bv.radius);
-            tempModelSO.getTransform().setPosition(0, 0, 0);
-            enableDisableLightOnModel(tempModelSO, oLightFlag);
+            tempModelSO.getTransform().setPosition(defaultCenterPosition.x, defaultCenterPosition.y, defaultCenterPosition.z);
             room.addSceneObject(tempModelSO);
             room.bindShaders();
+            enableDisableLightOnModel(tempModelSO, oLightFlag);
+
             removeLoadingInRoom(room);
             Log.d(TAG, "Loading Done");
             currentDisplayedModel = aModel.get(index);
@@ -507,7 +503,7 @@ public class Controller {
 
         if (currentDisplayedModel != null) {
             if (holder == currentDisplayedModel.getModel(context).getEyePointeeHolder()) {
-                Log.e(TAG, "Angle mover applied");
+                Log.d(TAG, "Angle mover applied");
                 if (scrollValue > 0)
                     animation = new GVRRotationByAxisAnimation(currentDisplayedModel.getModel(context), 0.1f, 35, 0, 1, 0).start(context.getAnimationEngine());
                 else
@@ -519,7 +515,7 @@ public class Controller {
 
     void onZoomOverModel(float zoomBy) {
         float zTransform = (int) ((zoomBy) / (10));
-        Log.e(TAG, "Zoom by" + Float.toString(zTransform) + "  " + Float.toString(zoomBy));
+        Log.d(TAG, "Zoom by" + Float.toString(zTransform) + "  " + Float.toString(zoomBy));
         if (currentDisplayedModel != null) {
             float units = currentDisplayedModel.getCurrentZoom();
             if (units < zTransform) {
@@ -589,7 +585,7 @@ public class Controller {
     }
 
     void addSkyBox(int index, GVRScene scene) {
-        Log.e(TAG, "Adding SkyBox");
+        Log.d(TAG, "Adding SkyBox");
         GVRSphereSceneObject current = null;
         if (currentSkyBox != null)
             scene.removeSceneObject(currentSkyBox);
@@ -606,7 +602,7 @@ public class Controller {
             currentSkyBox = current;
             current.getTransform().setPosition(defaultCenterPosition.x, defaultCenterPosition.y, defaultCenterPosition.z);
         } else {
-            Log.e(TAG, "SkyBox is null");
+            Log.d(TAG, "SkyBox is null");
         }
     }
 
