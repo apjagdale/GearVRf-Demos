@@ -42,7 +42,6 @@ public class Controller {
     private GVRSphereSceneObject currentSkyBox;
 
     // Variables related to Camera
-    //private Vector3f defaultCameraPosition = new Vector3f(0, 200, 1000);
     private ArrayList<CameraPosition> oDefaultCameraPosition;
     private CameraPosition oCurrentPosition;
 
@@ -209,6 +208,8 @@ public class Controller {
         aSCustomShaderList.add("No Texture");
         aSCustomShaderList.add("Outline");
         aSCustomShaderList.add("Lines");
+        aSCustomShaderList.add("Lines_Loop");
+        aSCustomShaderList.add("Points");
     }
 
     public ArrayList<String> getListOfCustomShaders() {
@@ -251,6 +252,20 @@ public class Controller {
                 for (GVRRenderData rdata : renderDatas) {
                     rdata.setShaderTemplate(GVRPhongShader.class);
                     rdata.setDrawMode(1);
+                }
+
+                break;
+            case 4:
+                for (GVRRenderData rdata : renderDatas) {
+                    rdata.setShaderTemplate(GVRPhongShader.class);
+                    rdata.setDrawMode(3);
+                }
+
+                break;
+            case 5:
+                for (GVRRenderData rdata : renderDatas) {
+                    rdata.setShaderTemplate(GVRPhongShader.class);
+                    rdata.setDrawMode(0);
                 }
 
                 break;
