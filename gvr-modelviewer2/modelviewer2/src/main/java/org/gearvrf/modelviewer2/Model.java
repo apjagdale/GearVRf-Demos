@@ -43,11 +43,6 @@ public class Model {
     String name;
     String location;
 
-    /* Will also have
-     1. Eye Pointer attached
-     2. GVRTextViewSceneObject textObject attached*/
-    //  GVRSceneObject thumbnail;
-
     GVRModelSceneObject model;
     ArrayList<GVRMaterial> originalMaterial;
     List<GVRAnimation> animation;
@@ -90,9 +85,7 @@ public class Model {
         playPauseHolder.addPointee(new GVRMeshEyePointee(context, boundingBox.getMesh()));
         model.attachEyePointeeHolder(playPauseHolder);
 
-
         // Adding Pointee to Model
-        /*GVRSceneObject.BoundingVolume*/
         bv = model.getBoundingVolume();
         float originalRadius = bv.radius;
         Log.e(TAG, "Radius" + Float.toString(originalRadius));
@@ -104,37 +97,10 @@ public class Model {
             float scaleFactor = 7 / originalRadius;
             model.getTransform().setScale(scaleFactor, scaleFactor, scaleFactor);
             bv = model.getBoundingVolume();
-            originalRadius = bv.radius;
         }
-
-        //currentRadius = originalRadius;
-
-        //After setting position
- /*       bv = model.getBoundingVolume();
-        radius = bv.radius;
-        Log.e(TAG, "Radius" + Float.toString(radius));
-        min_corner = bv.minCorner;
-        max_corner = bv.maxCorner;
-
-
-        BoundingBoxCreator boundingBox = new BoundingBoxCreator(context, bv);
-        GVREyePointeeHolder playPauseHolder = new GVREyePointeeHolder(context);
-        playPauseHolder.addPointee(new GVRMeshEyePointee(context, boundingBox.getMesh()));
-        model.attachEyePointeeHolder(playPauseHolder);
-
-        // Just to check bounding range
-        AccessibilitySceneShader shader = new AccessibilitySceneShader(context);
-        GVRRenderData renderData2 = new GVRRenderData(context);
-        GVRMaterial mat2 = new GVRMaterial(context, shader.getShaderId());
-        GVRMesh t = boundingBox.getMesh();
-        renderData2.setMesh(t);
-        renderData2.setMaterial(mat2);
-        model.attachRenderData(renderData2);*/
 
         // Make Copy of Original Render Data
         saveRenderData();
-        // model.getTransform().setPosition(0.0f, 200.0f, 980.0f);
-
 
         // Load Animations
         animation = model.getAnimations();

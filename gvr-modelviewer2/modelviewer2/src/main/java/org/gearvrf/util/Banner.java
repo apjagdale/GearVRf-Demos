@@ -5,6 +5,7 @@ import android.view.Gravity;
 
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVRRenderData;
+import org.gearvrf.GVRSceneObject;
 import org.gearvrf.scene_objects.GVRTextViewSceneObject;
 
 public class Banner {

@@ -16,12 +16,8 @@
 
 package org.gearvrf.util;
 
-import android.content.Context;
-
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVRPhongShader;
-import org.gearvrf.modelviewer2.R;
-import org.gearvrf.utility.TextFile;
 
 public class OutlineShader extends GVRPhongShader {
     public static final String COLOR_KEY = "u_color";
