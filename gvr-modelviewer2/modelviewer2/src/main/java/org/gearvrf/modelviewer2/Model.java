@@ -15,23 +15,16 @@
 
 package org.gearvrf.modelviewer2;
 
-import android.graphics.Color;
 import android.util.Log;
-import android.view.Gravity;
 
-import org.gearvrf.GVRAndroidResource;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVREyePointeeHolder;
 import org.gearvrf.GVRMaterial;
-import org.gearvrf.GVRMesh;
 import org.gearvrf.GVRMeshEyePointee;
 import org.gearvrf.GVRRenderData;
 import org.gearvrf.GVRSceneObject;
-import org.gearvrf.GVRTexture;
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.scene_objects.GVRModelSceneObject;
-import org.gearvrf.scene_objects.GVRTextViewSceneObject;
-import org.gearvrf.util.AccessibilitySceneShader;
 import org.gearvrf.util.BoundingBoxCreator;
 import org.joml.Vector3f;
 
@@ -46,11 +39,10 @@ public class Model {
     GVRModelSceneObject model;
     ArrayList<GVRMaterial> originalMaterial;
     List<GVRAnimation> animation;
-    private float originalZoom;
     private float currentZoom = 0;
 
 
-    private static final String TAG = "Abhijit";
+    private static final String TAG = "Model";
 
     public Model(String name, String location) {
         this.name = name;

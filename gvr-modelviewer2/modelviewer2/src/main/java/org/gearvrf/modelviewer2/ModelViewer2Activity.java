@@ -15,23 +15,16 @@
 
 package org.gearvrf.modelviewer2;
 
-import org.gearvrf.scene_objects.view.GVRFrameLayout;
 import org.gearvrf.util.VRTouchPadGestureDetector;
 import org.gearvrf.util.VRTouchPadGestureDetector.OnTouchPadGestureListener;
 import org.gearvrf.util.VRTouchPadGestureDetector.SwipeDirection;
 import org.gearvrf.GVRActivity;
 import org.gearvrf.widgetplugin.GVRWidgetPlugin;
 
-import android.content.res.AssetManager;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.util.Log;
-import android.widget.Button;
-
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class ModelViewer2Activity extends GVRActivity implements
         OnTouchPadGestureListener {
@@ -63,20 +56,20 @@ public class ModelViewer2Activity extends GVRActivity implements
 
     @Override
     public boolean onSingleTap(MotionEvent e) {
-        Log.e("Abhijit", "onSingleTap");
+        Log.i(TAG, "onSingleTap");
         mManager.onSingleTap(e);
         return false;
     }
 
     @Override
     public void onLongPress(MotionEvent e) {
-        Log.v("", "onLongPress");
+        Log.i(TAG, "onLongPress");
     }
 
     @Override
     public boolean onSwipe(MotionEvent e, SwipeDirection swipeDirection,
                            float velocityX, float velocityY) {
-        Log.v("", "onSwipe");
+        Log.i(TAG, "onSwipe");
         mManager.onSwipe(e, swipeDirection, velocityX, velocityY);
         return false;
     }
