@@ -1,3 +1,1 @@
-include ':framework'
-include ':gvr360video'
-project(':framework').projectDir = new File('../../GearVRf/GVRf/Framework/framework')
+include ':app'
