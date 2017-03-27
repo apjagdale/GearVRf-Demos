@@ -136,7 +136,6 @@ public class Main extends GVRMain implements KeyboardEventListener {
             if (sceneObject instanceof SphereFlag && sceneObject.equals(lastSelectedSphereFlag)) {
                 if (((SphereFlag) sceneObject).answerState == SphereStaticList.MOVEABLE) {
                     restoreObjectToItsDefaultPosition(sceneObject);
-                    //this.mDisableSnapSound = false;
                     lastSelectedSphereFlag = null;
                 }
             }
